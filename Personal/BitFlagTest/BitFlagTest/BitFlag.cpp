@@ -5,11 +5,12 @@ BitFlag::BitFlag() : Data(0) { };
 
 int BitFlag::FindAddress(const int Index) const
 {
-	int Address = 0;
-	for (int i = 0; i <= Index; ++i)
+	int Address = 1;
+	for (int i = 0; i < Index; ++i)
 	{
-		Address += 2 * i;
+		Address *= 2;
 	}
+
 	return Address;
 }
 
