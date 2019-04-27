@@ -1,4 +1,4 @@
 # C++ Git Ignore
 
-/Debug
+*/Debug
 *.exe
