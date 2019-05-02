@@ -1,4 +1,6 @@
 # C++ Git Ignore
 
+*/,vs
+*/x64
 */Debug
 *.exe
