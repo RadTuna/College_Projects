@@ -1,0 +1,36 @@
+
+#include "GraphicsClass.h"
+
+
+GraphicsClass::GraphicsClass()
+{
+}
+
+GraphicsClass::GraphicsClass(const GraphicsClass&)
+{
+}
+
+GraphicsClass::~GraphicsClass()
+{
+}
+
+bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
+{
+	return true;
+}
+
+void GraphicsClass::Shutdown()
+{
+	return;
+}
+
+bool GraphicsClass::Frame()
+{
+	return true;
+}
+
+bool GraphicsClass::Render()
+{
+	return true;
+}
+
