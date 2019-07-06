@@ -15,33 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="GameTimer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="SystemClass.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="InputClass.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsClass.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="D3DClass.cpp">
+    <ClCompile Include="D3DUtil.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="InputClass.h">
+    <ClInclude Include="GameTimer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsClass.h">
+    <ClInclude Include="D3DApp.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="D3DClass.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemClass.h">
+    <ClInclude Include="D3DUtil.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

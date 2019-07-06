@@ -1,6 +1,6 @@
 #pragma once
 
-#include <windows.h>
+#include "D3DClass.h"
 
 
 const bool FULL_SCREEN = false;
@@ -23,6 +23,7 @@ private:
 	bool Render();
 
 private:
+	D3DClass* mD3D;
 
 };
 
