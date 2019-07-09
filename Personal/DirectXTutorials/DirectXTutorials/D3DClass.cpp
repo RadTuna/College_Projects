@@ -21,6 +21,7 @@ D3DClass::~D3DClass()
 {
 }
 
+// D3D11을 초기화하는 함수.
 bool D3DClass::Initialize(int ScreenWidth, int ScreenHeight, bool VSync, HWND hWnd, bool FullScreen, float ScreenDepth, float ScreenNear)
 {
 	HRESULT Result;
@@ -334,17 +335,17 @@ bool D3DClass::Initialize(int ScreenWidth, int ScreenHeight, bool VSync, HWND hW
 	mDeviceContext->RSSetViewports(1, &ViewPort);
 
 	// 투영행렬을 설정함.
-	FieldOfView = static_cast<float>(XM_PI / 4.0f);
+	FieldOfView = static_cast<float>(DirectX::XM_PI / 4.0f);
 	ScreenAspect = static_cast<float>(ScreenWidth) / static_cast<float>(ScreenHeight);
 
 	// 3D 렌더링을 위한 투영행렬을 생성함.
-	mProjectionMatrix = XMMatrixPerspectiveLH(FieldOfView, ScreenAspect, ScreenNear, ScreenDepth);
+	DirectX::XMStoreFloat4x4(&mProjectionMatrix, DirectX::XMMatrixPerspectiveLH(FieldOfView, ScreenAspect, ScreenNear, ScreenDepth));
 
 	// 월드 행렬을 단위 행렬로 초기화.
-	mWorldMatrix = XMMatrixIdentity();
+	DirectX::XMStoreFloat4x4(&mWorldMatrix, DirectX::XMMatrixIdentity());
 
 	// 2D 렌더링에 사용 될 직교 투영 행렬을 생성함.
-	XMMatrixOrthographicLH(static_cast<float>(ScreenWidth), static_cast<float>(ScreenHeight), ScreenNear, ScreenDepth);
+	DirectX::XMStoreFloat4x4(&mOrthoMatrix, DirectX::XMMatrixOrthographicLH(static_cast<float>(ScreenWidth), static_cast<float>(ScreenHeight), ScreenNear, ScreenDepth));
 
 	return true;
 }
@@ -447,21 +448,21 @@ ID3D11DeviceContext* D3DClass::GetDeviceContext()
 	return mDeviceContext;
 }
 
-void D3DClass::GetProjectionMatrix(XMMATRIX& ProjectionMatrix)
+void D3DClass::GetProjectionMatrix(DirectX::XMMATRIX& ProjectionMatrix)
 {
-	ProjectionMatrix = mProjectionMatrix;
+	ProjectionMatrix = DirectX::XMLoadFloat4x4(&mProjectionMatrix);
 	return;
 }
 
-void D3DClass::GetWorldMatrix(XMMATRIX& WorldMatrix)
+void D3DClass::GetWorldMatrix(DirectX::XMMATRIX& WorldMatrix)
 {
-	WorldMatrix = mWorldMatrix;
+	WorldMatrix = DirectX::XMLoadFloat4x4(&mWorldMatrix);
 	return;
 }
 
-void D3DClass::GetOrthoMatrix(XMMATRIX& OrthoMatrix)
+void D3DClass::GetOrthoMatrix(DirectX::XMMATRIX& OrthoMatrix)
 {
-	OrthoMatrix = mOrthoMatrix;
+	OrthoMatrix = DirectX::XMLoadFloat4x4(&mOrthoMatrix);
 	return;
 }
 
