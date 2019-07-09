@@ -1,0 +1,14 @@
+
+// 타입 지정
+struct PixelInputType
+{
+    float4 Position : SV_POSITION;
+    float4 Color : COLOR;
+};
+
+// 픽셀 셰이더
+float4 ColorPixelShader(PixelInputType Input) : SV_Target
+{
+    return Input.Color;
+}
+
