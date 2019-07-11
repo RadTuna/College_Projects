@@ -1,6 +1,7 @@
 
 #include "ColorShaderClass.h"
 
+
 ColorShaderClass::ColorShaderClass()
 {
 	mVertexShader = nullptr;
@@ -22,7 +23,7 @@ bool ColorShaderClass::Initialize(ID3D11Device* Device, HWND hWnd)
 	bool Result;
 
 	// 버텍스 셰이더와 픽셀 셰이더를 초기화.
-	Result = InitializeShader(Device, hWnd, const_cast<WCHAR*>(L"../Engine/ColorVS.vs"), const_cast<WCHAR*>(L"../Engine/ColorPS.ps"));
+	Result = InitializeShader(Device, hWnd, const_cast<WCHAR*>(L"../DirectXTutorials/ColorVS.vs"), const_cast<WCHAR*>(L"../DirectXTutorials/ColorPS.ps"));
 	if (Result == false)
 	{
 		return false;
@@ -39,7 +40,7 @@ void ColorShaderClass::Shutdown()
 	return;
 }
 
-bool ColorShaderClass::Render(ID3D11DeviceContext* DeviceContext, int IndexCount, DirectX::FXMMATRIX WorldMat, DirectX::CXMMATRIX ViewMat, DirectX::CXMMATRIX ProjectionMat)
+bool ColorShaderClass::Render(ID3D11DeviceContext* DeviceContext, int IndexCount, DirectX::XMMATRIX& WorldMat, DirectX::XMMATRIX& ViewMat, DirectX::XMMATRIX& ProjectionMat)
 {
 	bool Result;
 
@@ -75,7 +76,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* Device, HWND hWnd, WCHAR* 
 	// 여기서 셰이더 프로그램을 버퍼로 컴파일함.
 
 	// 버텍스 셰이더를 컴파일.
-	Result = D3DCompileFromFile(VsFileName, nullptr, nullptr, "ColorPixelShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &VertexShaderBuffer, &ErrorMessage);
+	Result = D3DCompileFromFile(VsFileName, nullptr, nullptr, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &VertexShaderBuffer, &ErrorMessage);
 	if (FAILED(Result))
 	{
 		// 셰이더 컴파일에 실패하면 에러 메세지를 기록함.
@@ -86,13 +87,12 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* Device, HWND hWnd, WCHAR* 
 		// 에러 메세지가 없다면 셰이더 파일을 찾지 못한것.
 		else
 		{
-			char* FileName;
-			wcstombs_s(nullptr, FileName, 128, VsFileName, 128);
-			MessageBox(hWnd, FileName, "Missing VertexShader File", MB_OK);
+			MessageBoxW(hWnd, VsFileName, L"Missing VertexShader File", MB_OK);
 		}
 
 		return false;
 	}
+
 
 	// 픽셀 셰이더를 컴파일.
 	Result = D3DCompileFromFile(PsFileName, nullptr, nullptr, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &PixelShaderBuffer, &ErrorMessage);
@@ -106,9 +106,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* Device, HWND hWnd, WCHAR* 
 		// 에러 메세지가 없다면 셰이더 파일을 찾지 못한것.
 		else
 		{
-			char* FileName;
-			wcstombs_s(nullptr, FileName, 128, PsFileName, 128);
-			MessageBox(hWnd, FileName, "Missing PixelShader File", MB_OK);
+			MessageBoxW(hWnd, VsFileName, L"Missing PixelShader File", MB_OK);
 		}
 
 		return false;
@@ -140,13 +138,13 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* Device, HWND hWnd, WCHAR* 
 	PolygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	PolygonLayout[0].InstanceDataStepRate = 0;
 
-	PolygonLayout[0].SemanticName = "COLOR";
-	PolygonLayout[0].SemanticIndex = 0;
-	PolygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	PolygonLayout[0].InputSlot = 0;
-	PolygonLayout[0].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	PolygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	PolygonLayout[0].InstanceDataStepRate = 0;
+	PolygonLayout[1].SemanticName = "COLOR";
+	PolygonLayout[1].SemanticIndex = 0;
+	PolygonLayout[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	PolygonLayout[1].InputSlot = 0;
+	PolygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	PolygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	PolygonLayout[1].InstanceDataStepRate = 0;
 
 	// 레이아웃의 요소 개수를 가져옴.
 	NumElements = sizeof(PolygonLayout) / sizeof(PolygonLayout[0]);
@@ -172,7 +170,6 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* Device, HWND hWnd, WCHAR* 
 	MatrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	MatrixBufferDesc.MiscFlags = 0;
 	MatrixBufferDesc.StructureByteStride = 0;
-	MatrixBufferDesc.
 
 	// 상수 버퍼 포인터를 만들어 이 클래스에서 정점 셰이더 상수 버퍼에 접근할 수 있도록 함.
 	Result = Device->CreateBuffer(&MatrixBufferDesc, nullptr, &mMatrixBuffer);
@@ -248,8 +245,60 @@ void ColorShaderClass::OutputShaderErrorMessage(ID3DBlob* ErrorMessage, HWND hWn
 	ErrorMessage = nullptr;
 
 	// 컴파일 에러가 있음을 팝업 메세지로 알려줌.
-	char* FileName;
-	wcstombs_s(nullptr, FileName, 128, ShaderFileName, 128);
-	MessageBox(hWnd, "Error compiling shader. Check shader-error.txt for message.", FileName, MB_OK);
+	MessageBoxW(hWnd, L"Error compiling shader. Check shader-error.txt for message.", ShaderFileName, MB_OK);
+
+	return;
+}
+
+bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* DeviceContext, DirectX::XMMATRIX& WorldMat, DirectX::XMMATRIX& ViewMat, DirectX::XMMATRIX& ProjectionMat)
+{
+	HRESULT Result;
+	D3D11_MAPPED_SUBRESOURCE MappedResource;
+	MatrixBufferType* DataPtr;
+	unsigned int BufferNumber;
+
+	// 행렬을 전치하여 셰이더에서 사용할 수 있도록 함.
+	WorldMat = DirectX::XMMatrixTranspose(WorldMat);
+	ViewMat = DirectX::XMMatrixTranspose(ViewMat);
+	ProjectionMat = DirectX::XMMatrixTranspose(ProjectionMat);
+
+	// 상수 버퍼의 내용을 쓸 수 있도록 잠금.
+	Result = DeviceContext->Map(mMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
+	if (FAILED(Result))
+	{
+		return false;
+	}
+
+	// 상수버퍼에 데이터에 대한 포인터를 가져옴.
+	DataPtr = reinterpret_cast<MatrixBufferType*>(MappedResource.pData);
+
+	// 상수 버퍼에 행렬을 복사함.
+	DirectX::XMStoreFloat4x4(&DataPtr->World, WorldMat);
+	DirectX::XMStoreFloat4x4(&DataPtr->View, ViewMat);
+	DirectX::XMStoreFloat4x4(&DataPtr->Projection, ProjectionMat);
+
+	// 상수 버퍼의 잠금을 품.
+	DeviceContext->Unmap(mMatrixBuffer, 0);
+
+	// 정점 셰이더에서의 상수 버퍼의 위치를 설정.
+	BufferNumber = 0;
+
+	// 마지막으로 정점 셰이더의 버퍼를 바뀐값으로 바꿈.
+	DeviceContext->VSSetConstantBuffers(BufferNumber, 1, &mMatrixBuffer);
+
+	return true;
+}
+
+void ColorShaderClass::RenderShader(ID3D11DeviceContext* DeviceContext, int IndexCount)
+{
+	// 정점 입력 레이아웃을 설정.
+	DeviceContext->IASetInputLayout(mLayout);
+
+	// 삼각형을 그릴 정점 셰이더와 픽셀 셰이더를 설정.
+	DeviceContext->VSSetShader(mVertexShader, nullptr, 0);
+	DeviceContext->PSSetShader(mPixelShader, nullptr, 0);
+
+	// 삼각형을 그림.
+	DeviceContext->DrawIndexed(IndexCount, 0, 0);
 }
 

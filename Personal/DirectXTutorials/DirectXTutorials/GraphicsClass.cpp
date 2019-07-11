@@ -5,6 +5,9 @@
 GraphicsClass::GraphicsClass()
 {
 	mD3D = nullptr;
+	mCamera = nullptr;
+	mModel = nullptr;
+	mColorShader = nullptr;
 }
 
 GraphicsClass::GraphicsClass(const GraphicsClass&)
@@ -19,14 +22,14 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 {
 	bool Result;
 
-	//Direct3D 객체를 생성.
+	// Direct3D 객체를 생성.
 	mD3D = new D3DClass;
 	if (mD3D == nullptr)
 	{
 		return false;
 	}
 
-	//Direct3D 객체를 초기화.
+	// Direct3D 객체를 초기화.
 	Result = mD3D->Initialize(ScreenWidth, ScreenHeight, VSYNC_ENABLED, hWnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 	if (Result == false)
 	{
@@ -34,11 +37,73 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 		return false;
 	}
 
+	// Camera 객체를 생성.
+	mCamera = new CameraClass;
+	if (mCamera == nullptr)
+	{
+		return false;
+	}
+
+	// Camera의 초기위치를 설정.
+	mCamera->SetPosition(0.0f, 0.0f, 0.0f);
+	
+	// Model 객체를 생성.
+	mModel = new ModelClass;
+	if (mModel == nullptr)
+	{
+		return false;
+	}
+
+	// Model 객체를 초기화.
+	Result = mModel->Initialize(mD3D->GetDevice());
+	if (Result == false)
+	{
+		MessageBox(hWnd, "Could not initialize Model object", "Error", MB_OK);
+		return false;
+	}
+
+	// ColorShader 객체를 생성.
+	mColorShader = new ColorShaderClass;
+	if (mColorShader == nullptr)
+	{
+		return false;
+	}
+
+	// ColorShader 객체를 초기화.
+	Result = mColorShader->Initialize(mD3D->GetDevice(), hWnd);
+	if (Result == false)
+	{
+		MessageBox(hWnd, "Could not initialize ColorShader object", "Error", MB_OK);
+		return false;
+	}
+
+
 	return true;
 }
 
 void GraphicsClass::Shutdown()
 {
+	// ColorShader 객체를 반환.
+	if (mColorShader != nullptr)
+	{
+		mColorShader->Shutdown();
+		mColorShader = nullptr;
+	}
+
+	// Model 객체를 반환.
+	if (mModel != nullptr)
+	{
+		mModel->Shutdown();
+		mModel = nullptr;
+	}
+
+	// Camera 객체를 반환.
+	if (mCamera != nullptr)
+	{
+		delete mCamera;
+		mCamera = nullptr;
+	}
+
 	// D3D 객체를 반환.
 	if (mD3D != nullptr)
 	{
@@ -66,8 +131,32 @@ bool GraphicsClass::Frame()
 
 bool GraphicsClass::Render()
 {
+	bool Result;
+
+	DirectX::XMMATRIX WorldMat;
+	DirectX::XMMATRIX ViewMat;
+	DirectX::XMMATRIX ProjectionMat;
+
 	// 씬 그리기를 시작하기 위해 버퍼의 내용을 지움.
-	mD3D->BeginScene(1.0f, 1.0f, 0.0f, 1.0f);
+	mD3D->BeginScene(0.2f, 0.0f, 0.1f, 1.0f);
+
+	// 카메라의 위치를 기반으로 View행렬을 생성함.
+	mCamera->Render();
+
+	// 카메라, D3D 객체로부터 행렬들을 획득.
+	ViewMat = mCamera->GetViewMatrix();
+	WorldMat = mD3D->GetWorldMatrix();
+	ProjectionMat = mD3D->GetProjectionMatrix();
+
+	// 그래픽 파이프라인이 그리는 것을 준비하기 위해 버텍스-인덱스 버퍼를 넣음.
+	mModel->Render(mD3D->GetDeviceContext());
+
+	// ColorShader를 사용해 모델을 렌더링.
+	Result = mColorShader->Render(mD3D->GetDeviceContext(), mModel->GetIndexCount(), WorldMat, ViewMat, ProjectionMat);
+	if (Result == false)
+	{
+		return false;
+	}
 
 	// 버퍼에 그려진 씬을 화면에 표시함.
 	mD3D->EndScene();

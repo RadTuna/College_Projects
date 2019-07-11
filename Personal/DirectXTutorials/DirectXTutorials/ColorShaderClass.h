@@ -30,7 +30,7 @@ public:
 
 	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, int, DirectX::FXMMATRIX, DirectX::CXMMATRIX, DirectX::CXMMATRIX);
+	bool Render(ID3D11DeviceContext*, int, DirectX::XMMATRIX&, DirectX::XMMATRIX&, DirectX::XMMATRIX&);
 
 private:
 
@@ -38,7 +38,7 @@ private:
 	void ShutdownShader();
 	void OutputShaderErrorMessage(ID3DBlob*, HWND, WCHAR*);
 
-	bool SetShaderParameters(ID3D11DeviceContext*, DirectX::FXMMATRIX, DirectX::CXMMATRIX, DirectX::CXMMATRIX);
+	bool SetShaderParameters(ID3D11DeviceContext*, DirectX::XMMATRIX&, DirectX::XMMATRIX&, DirectX::XMMATRIX&);
 	void RenderShader(ID3D11DeviceContext*, int);
 
 private:

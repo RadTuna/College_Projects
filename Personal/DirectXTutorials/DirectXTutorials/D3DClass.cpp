@@ -1,6 +1,7 @@
 
 #include "D3DClass.h"
 
+
 D3DClass::D3DClass()
 {
 	mSwapChain = nullptr;
@@ -448,22 +449,19 @@ ID3D11DeviceContext* D3DClass::GetDeviceContext()
 	return mDeviceContext;
 }
 
-void D3DClass::GetProjectionMatrix(DirectX::XMMATRIX& ProjectionMatrix)
+DirectX::XMMATRIX D3DClass::GetProjectionMatrix() const
 {
-	ProjectionMatrix = DirectX::XMLoadFloat4x4(&mProjectionMatrix);
-	return;
+	return DirectX::XMLoadFloat4x4(&mProjectionMatrix);
 }
 
-void D3DClass::GetWorldMatrix(DirectX::XMMATRIX& WorldMatrix)
+DirectX::XMMATRIX D3DClass::GetWorldMatrix() const
 {
-	WorldMatrix = DirectX::XMLoadFloat4x4(&mWorldMatrix);
-	return;
+	return DirectX::XMLoadFloat4x4(&mWorldMatrix);
 }
 
-void D3DClass::GetOrthoMatrix(DirectX::XMMATRIX& OrthoMatrix)
+DirectX::XMMATRIX D3DClass::GetOrthoMatrix() const
 {
-	OrthoMatrix = DirectX::XMLoadFloat4x4(&mOrthoMatrix);
-	return;
+	return DirectX::XMLoadFloat4x4(&mOrthoMatrix);
 }
 
 void D3DClass::GetVideoCardInfo(char* CardName, int& Memory)

@@ -10,13 +10,13 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 
-using namespace DirectX;
 
 // 튜토리얼과 달리 d3dx10Math.h가 SDK에 포함되어 있지않음.
 // 따라서, MS에서 권장하는 대로 DirectXMath.h를 사용하기로 결정함.
 class D3DClass
 {
 public:
+
 	D3DClass();
 	D3DClass(const D3DClass&);
 	~D3DClass();
@@ -30,13 +30,14 @@ public:
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetDeviceContext();
 
-	void GetProjectionMatrix(XMMATRIX&);
-	void GetWorldMatrix(XMMATRIX&);
-	void GetOrthoMatrix(XMMATRIX&);
+	DirectX::XMMATRIX GetProjectionMatrix() const;
+	DirectX::XMMATRIX GetWorldMatrix() const;
+	DirectX::XMMATRIX GetOrthoMatrix() const;
 
 	void GetVideoCardInfo(char*, int&);
 
 private:
+
 	bool mVSyncEnabled;
 	int mVideoCardMemory;
 	char mVideoCardDescription[128];
@@ -48,8 +49,9 @@ private:
 	ID3D11DepthStencilState* mDepthStencilState;
 	ID3D11DepthStencilView* mDepthStencilView;
 	ID3D11RasterizerState* mRasterState;
-	XMMATRIX mProjectionMatrix;
-	XMMATRIX mWorldMatrix;
-	XMMATRIX mOrthoMatrix;
+	DirectX::XMFLOAT4X4 mProjectionMatrix;
+	DirectX::XMFLOAT4X4 mWorldMatrix;
+	DirectX::XMFLOAT4X4 mOrthoMatrix;
+
 };
 
