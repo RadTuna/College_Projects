@@ -13,6 +13,7 @@
 class SystemClass
 {
 public:
+
 	SystemClass();
 	SystemClass(const SystemClass&);
 	~SystemClass();
@@ -24,17 +25,20 @@ public:
 	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
 
 private:
+
 	bool Frame();
 	void InitializeWindows(int&, int&);
 	void ShutdownWindows();
 
 private:
+
 	LPCSTR mApplicationName;
 	HINSTANCE mhInstance;
 	HWND mhWnd;
 
 	InputClass* mInput;
 	GraphicsClass* mGraphics;
+
 };
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);

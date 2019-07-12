@@ -148,8 +148,12 @@
     <ClInclude Include="SystemClass.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ColorPS.ps" />
-    <None Include="ColorVS.vs" />
+    <None Include="ColorPS.ps">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="ColorVS.vs">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

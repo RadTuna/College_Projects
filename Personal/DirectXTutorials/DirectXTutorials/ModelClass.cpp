@@ -6,8 +6,6 @@ ModelClass::ModelClass()
 {
 	mVertexBuffer = nullptr;
 	mIndexBuffer = nullptr;
-	mVertexCount = 0;
-	mIndexCount = 0;
 }
 
 ModelClass::ModelClass(const ModelClass& Other)
@@ -51,7 +49,7 @@ void ModelClass::Render(ID3D11DeviceContext* DeviceContext)
 bool ModelClass::InitializeBuffers(ID3D11Device* Device)
 {
 	VertexType* Vertices;
-	unsigned __int64* Indices;
+	unsigned long* Indices;
 	D3D11_BUFFER_DESC VertexBufferDesc;
 	D3D11_BUFFER_DESC IndexBufferDesc;
 	D3D11_SUBRESOURCE_DATA VertexData;
@@ -72,7 +70,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* Device)
 	}
 
 	// 인덱스 배열을 생성 (임시배열)
-	Indices = new unsigned __int64[mIndexCount];
+	Indices = new unsigned long[mIndexCount];
 	if (Indices == nullptr)
 	{
 		return false;
@@ -120,8 +118,8 @@ bool ModelClass::InitializeBuffers(ID3D11Device* Device)
 
 	// 인덱스 버퍼의 Description을 작성.
 	IndexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	IndexBufferDesc.ByteWidth = sizeof(unsigned __int64) * mIndexCount;
-	IndexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	IndexBufferDesc.ByteWidth = sizeof(unsigned long) * mIndexCount;
+	IndexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	IndexBufferDesc.CPUAccessFlags = 0;
 	IndexBufferDesc.MiscFlags = 0;
 	IndexBufferDesc.StructureByteStride = 0;
@@ -171,8 +169,8 @@ void ModelClass::ShutdownBuffers()
 // 버텍스-인덱스 버퍼를 GPU의 어셈블러로 넣어 렌더링을 요청함.
 void ModelClass::RenderBuffers(ID3D11DeviceContext* DeviceContext)
 {
-	unsigned __int32 Stride;
-	unsigned __int32 Offset;
+	unsigned int Stride;
+	unsigned int Offset;
 
 	// 버텍스 단위와 오프셋을 설정 (1개 버텍스).
 	Stride = sizeof(VertexType);
@@ -188,5 +186,10 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* DeviceContext)
 	DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return;
+}
+
+int ModelClass::GetIndexCount() const
+{
+	return mIndexCount;
 }
 

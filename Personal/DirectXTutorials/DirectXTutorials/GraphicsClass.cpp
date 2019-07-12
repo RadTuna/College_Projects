@@ -45,7 +45,7 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 	}
 
 	// Camera의 초기위치를 설정.
-	mCamera->SetPosition(0.0f, 0.0f, 0.0f);
+	mCamera->SetPosition(0.0f, 0.0f, -5.0f);
 	
 	// Model 객체를 생성.
 	mModel = new ModelClass;
@@ -145,8 +145,8 @@ bool GraphicsClass::Render()
 
 	// 카메라, D3D 객체로부터 행렬들을 획득.
 	ViewMat = mCamera->GetViewMatrix();
-	WorldMat = mD3D->GetWorldMatrix();
-	ProjectionMat = mD3D->GetProjectionMatrix();
+	mD3D->GetWorldMatrix(WorldMat);
+	mD3D->GetProjectionMatrix(ProjectionMat);
 
 	// 그래픽 파이프라인이 그리는 것을 준비하기 위해 버텍스-인덱스 버퍼를 넣음.
 	mModel->Render(mD3D->GetDeviceContext());

@@ -340,13 +340,13 @@ bool D3DClass::Initialize(int ScreenWidth, int ScreenHeight, bool VSync, HWND hW
 	ScreenAspect = static_cast<float>(ScreenWidth) / static_cast<float>(ScreenHeight);
 
 	// 3D 렌더링을 위한 투영행렬을 생성함.
-	DirectX::XMStoreFloat4x4(&mProjectionMatrix, DirectX::XMMatrixPerspectiveLH(FieldOfView, ScreenAspect, ScreenNear, ScreenDepth));
+	mProjectionMatrix = DirectX::XMMatrixPerspectiveFovLH(FieldOfView, ScreenAspect, ScreenNear, ScreenDepth);
 
 	// 월드 행렬을 단위 행렬로 초기화.
-	DirectX::XMStoreFloat4x4(&mWorldMatrix, DirectX::XMMatrixIdentity());
+	mWorldMatrix = DirectX::XMMatrixIdentity();
 
 	// 2D 렌더링에 사용 될 직교 투영 행렬을 생성함.
-	DirectX::XMStoreFloat4x4(&mOrthoMatrix, DirectX::XMMatrixOrthographicLH(static_cast<float>(ScreenWidth), static_cast<float>(ScreenHeight), ScreenNear, ScreenDepth));
+	mOrthoMatrix = DirectX::XMMatrixOrthographicLH(static_cast<float>(ScreenWidth), static_cast<float>(ScreenHeight), ScreenNear, ScreenDepth);
 
 	return true;
 }
@@ -449,19 +449,22 @@ ID3D11DeviceContext* D3DClass::GetDeviceContext()
 	return mDeviceContext;
 }
 
-DirectX::XMMATRIX D3DClass::GetProjectionMatrix() const
+void D3DClass::GetProjectionMatrix(DirectX::XMMATRIX& ProjectionMat) const
 {
-	return DirectX::XMLoadFloat4x4(&mProjectionMatrix);
+	ProjectionMat = mProjectionMatrix;
+	return;
 }
 
-DirectX::XMMATRIX D3DClass::GetWorldMatrix() const
+void D3DClass::GetWorldMatrix(DirectX::XMMATRIX& WorldMat) const
 {
-	return DirectX::XMLoadFloat4x4(&mWorldMatrix);
+	WorldMat = mWorldMatrix;
+	return;
 }
 
-DirectX::XMMATRIX D3DClass::GetOrthoMatrix() const
+void D3DClass::GetOrthoMatrix(DirectX::XMMATRIX& OrthoMat) const
 {
-	return DirectX::XMLoadFloat4x4(&mOrthoMatrix);
+	OrthoMat = mOrthoMatrix;
+	return;
 }
 
 void D3DClass::GetVideoCardInfo(char* CardName, int& Memory)

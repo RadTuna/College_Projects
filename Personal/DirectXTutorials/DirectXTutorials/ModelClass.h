@@ -30,7 +30,7 @@ public:
 	void Shutdown(); // 해제
 	void Render(ID3D11DeviceContext*); 
 
-	inline __int32 GetIndexCount() const;
+	int GetIndexCount() const;
 
 private:
 
@@ -43,14 +43,9 @@ private:
 	// 각자 형식이 동일 하지만 Description으로 구분함.
 	ID3D11Buffer* mVertexBuffer;
 	ID3D11Buffer* mIndexBuffer;
-	__int32 mVertexCount;
-	__int32 mIndexCount;
+	int mVertexCount;
+	int mIndexCount;
 
 };
 
-
-__int32 ModelClass::GetIndexCount() const
-{
-	return mIndexCount;
-}
 

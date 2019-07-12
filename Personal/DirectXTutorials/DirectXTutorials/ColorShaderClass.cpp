@@ -40,7 +40,7 @@ void ColorShaderClass::Shutdown()
 	return;
 }
 
-bool ColorShaderClass::Render(ID3D11DeviceContext* DeviceContext, int IndexCount, DirectX::XMMATRIX& WorldMat, DirectX::XMMATRIX& ViewMat, DirectX::XMMATRIX& ProjectionMat)
+bool ColorShaderClass::Render(ID3D11DeviceContext* DeviceContext, int IndexCount, DirectX::XMMATRIX WorldMat, DirectX::XMMATRIX ViewMat, DirectX::XMMATRIX ProjectionMat)
 {
 	bool Result;
 
@@ -65,7 +65,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* Device, HWND hWnd, WCHAR* 
 	ID3DBlob* VertexShaderBuffer;
 	ID3DBlob* PixelShaderBuffer;
 	D3D11_INPUT_ELEMENT_DESC PolygonLayout[2];
-	unsigned __int32 NumElements;
+	unsigned int NumElements;
 	D3D11_BUFFER_DESC MatrixBufferDesc;
 
 	// 이 함수에서 사용하는 포인터를 초기화
@@ -140,7 +140,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* Device, HWND hWnd, WCHAR* 
 
 	PolygonLayout[1].SemanticName = "COLOR";
 	PolygonLayout[1].SemanticIndex = 0;
-	PolygonLayout[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	PolygonLayout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	PolygonLayout[1].InputSlot = 0;
 	PolygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	PolygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -250,7 +250,7 @@ void ColorShaderClass::OutputShaderErrorMessage(ID3DBlob* ErrorMessage, HWND hWn
 	return;
 }
 
-bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* DeviceContext, DirectX::XMMATRIX& WorldMat, DirectX::XMMATRIX& ViewMat, DirectX::XMMATRIX& ProjectionMat)
+bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* DeviceContext, DirectX::XMMATRIX WorldMat, DirectX::XMMATRIX ViewMat, DirectX::XMMATRIX ProjectionMat)
 {
 	HRESULT Result;
 	D3D11_MAPPED_SUBRESOURCE MappedResource;
@@ -273,9 +273,9 @@ bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* DeviceContext, D
 	DataPtr = reinterpret_cast<MatrixBufferType*>(MappedResource.pData);
 
 	// 상수 버퍼에 행렬을 복사함.
-	DirectX::XMStoreFloat4x4(&DataPtr->World, WorldMat);
-	DirectX::XMStoreFloat4x4(&DataPtr->View, ViewMat);
-	DirectX::XMStoreFloat4x4(&DataPtr->Projection, ProjectionMat);
+	DataPtr->World = WorldMat;
+	DataPtr->View = ViewMat;
+	DataPtr->Projection = ProjectionMat;
 
 	// 상수 버퍼의 잠금을 품.
 	DeviceContext->Unmap(mMatrixBuffer, 0);
