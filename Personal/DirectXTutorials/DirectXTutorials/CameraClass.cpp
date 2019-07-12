@@ -34,19 +34,18 @@ void CameraClass::SetRotation(float X, float Y, float Z)
 	return;
 }
 
-DirectX::XMFLOAT3 CameraClass::GetPostion() const
+DirectX::XMVECTOR CameraClass::GetPostion() const
 {
-	return DirectX::XMFLOAT3(mPositionX, mPositionY, mPositionZ);
+	return DirectX::XMVectorSet(mPositionX, mPositionY, mPositionZ, 0.0f);
 }
 
-DirectX::XMFLOAT3 CameraClass::GetRotation() const
+DirectX::XMVECTOR CameraClass::GetRotation() const
 {
-	return DirectX::XMFLOAT3(mRotationX, mRotationY, mRotationZ);
+	return DirectX::XMVectorSet(mRotationX, mRotationY, mRotationZ, 0.0f);
 }
 
 void CameraClass::Render()
 {
-	DirectX::XMFLOAT3 Up, Position, LookAt;
 	DirectX::XMVECTOR UpVector, PositionVector, LookAtVector;
 
 	float Yaw;
@@ -56,25 +55,13 @@ void CameraClass::Render()
 	DirectX::XMMATRIX RotationMat;
 
 	// Up벡터를 초기화 함.
-	Up.x = 0.0f;
-	Up.y = 1.0f;
-	Up.z = 0.0f;
-
-	UpVector = DirectX::XMLoadFloat3(&Up);
+	UpVector = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
 	// 월드 좌표계에서의 카메라의 위치를 초기화.
-	Position.x = mPositionX;
-	Position.y = mPositionY;
-	Position.z = mPositionZ;
-
-	PositionVector = DirectX::XMLoadFloat3(&Position);
+	PositionVector = DirectX::XMVectorSet(mPositionX, mPositionY, mPositionZ, 0.0f);
 
 	// 카메라가 바라볼 위치의 기본값 지정.
-	LookAt.x = 0.0f;
-	LookAt.y = 0.0f;
-	LookAt.z = 1.0f;
-
-	LookAtVector = DirectX::XMLoadFloat3(&LookAt);
+	LookAtVector = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
 	// Yaw, Pitch, Roll의 값을 라디안으로 저장.
 	Pitch = DirectX::XMConvertToRadians(mRotationX);
@@ -92,13 +79,13 @@ void CameraClass::Render()
 	LookAtVector = DirectX::XMVectorAdd(PositionVector, LookAtVector);
 
 	// 3개의 벡터를 이용해서 View행렬을 생성.
-	mViewMatrix = DirectX::XMMatrixLookAtLH(PositionVector, LookAtVector, UpVector);
+	DirectX::XMStoreFloat4x4(&mViewMatrix, DirectX::XMMatrixLookAtLH(PositionVector, LookAtVector, UpVector));
 
 	return;
 }
 
 DirectX::XMMATRIX CameraClass::GetViewMatrix() const
 {
-	return mViewMatrix;
+	return DirectX::XMLoadFloat4x4(&mViewMatrix);
 }
 

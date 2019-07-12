@@ -9,6 +9,8 @@ struct PixelInputType
 // «»ºø ºŒ¿Ã¥ı
 float4 ColorPixelShader(PixelInputType Input) : SV_TARGET
 {
+	Input.Color *= 0.5f;
+
     return Input.Color;
 }
 

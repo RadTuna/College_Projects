@@ -57,10 +57,10 @@ bool ModelClass::InitializeBuffers(ID3D11Device* Device)
 	HRESULT Result;
 
 	// 버텍스 배열의 길이를 설정함.
-	mVertexCount = 3;
+	mVertexCount = 4;
 
 	// 인덱스 배열의 길이를 설정함.
-	mIndexCount = 3;
+	mIndexCount = 6;
 
 	// 버텍스 배열을 생성 (임시배열)
 	Vertices = new VertexType[mVertexCount];
@@ -80,19 +80,25 @@ bool ModelClass::InitializeBuffers(ID3D11Device* Device)
 	// 그렇지 않으면 DirectX는 Backface에 있다고 판단하여 Culling되어 보이지 않음.
 
 	// 버텍스 배열에 값을 넣음.
-	Vertices[0].Position = DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f); // 왼쪽 아래
-	Vertices[0].Color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	Vertices[0].Position = DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f); // 오른쪽 아래
+	Vertices[0].Color = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
-	Vertices[1].Position = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f); // 상단 가운데
-	Vertices[1].Color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	Vertices[1].Position = DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f); // 왼쪽 아래
+	Vertices[1].Color = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
-	Vertices[2].Position = DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f); // 오른쪽 아래
-	Vertices[2].Color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	Vertices[2].Position = DirectX::XMFLOAT3(-1.0f, 1.0f, 0.0f); // 왼쪽 위
+	Vertices[2].Color = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+
+	Vertices[3].Position = DirectX::XMFLOAT3(1.0f, 1.0f, 0.0f); // 오른쪽 위
+	Vertices[3].Color = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
 	// 인덱스 배열에 값을 넣음.
-	Indices[0] = 0; // 왼쪽 아래
-	Indices[1] = 1; // 상단 가운데
-	Indices[2] = 2; // 오른쪽 아래
+	Indices[0] = 0;
+	Indices[1] = 1;
+	Indices[2] = 2;
+	Indices[3] = 2;
+	Indices[4] = 3;
+	Indices[5] = 0;
 
 	// 버텍스-인덱스배열을 이용하여 버텍스-인덱스버퍼를 생성함.
 

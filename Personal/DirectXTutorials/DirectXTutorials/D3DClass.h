@@ -30,9 +30,9 @@ public:
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetDeviceContext();
 
-	void GetProjectionMatrix(DirectX::XMMATRIX&) const;
-	void GetWorldMatrix(DirectX::XMMATRIX&) const;
-	void GetOrthoMatrix(DirectX::XMMATRIX&) const;
+	DirectX::XMMATRIX GetProjectionMatrix() const;
+	DirectX::XMMATRIX GetWorldMatrix() const;
+	DirectX::XMMATRIX GetOrthoMatrix() const;
 
 	void GetVideoCardInfo(char*, int&);
 
@@ -49,9 +49,9 @@ private:
 	ID3D11DepthStencilState* mDepthStencilState;
 	ID3D11DepthStencilView* mDepthStencilView;
 	ID3D11RasterizerState* mRasterState;
-	DirectX::XMMATRIX mProjectionMatrix;
-	DirectX::XMMATRIX mWorldMatrix;
-	DirectX::XMMATRIX mOrthoMatrix;
+	DirectX::XMFLOAT4X4 mProjectionMatrix;
+	DirectX::XMFLOAT4X4 mWorldMatrix;
+	DirectX::XMFLOAT4X4 mOrthoMatrix;
 
 };
 

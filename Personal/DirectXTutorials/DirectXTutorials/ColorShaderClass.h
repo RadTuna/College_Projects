@@ -17,9 +17,9 @@ private:
 	// 버텍스 셰이더의 cbuffer 구조체와 구조가 동일해야 함.
 	struct MatrixBufferType
 	{
-		DirectX::XMMATRIX World;
-		DirectX::XMMATRIX View;
-		DirectX::XMMATRIX Projection;
+		DirectX::XMFLOAT4X4 World;
+		DirectX::XMFLOAT4X4 View;
+		DirectX::XMFLOAT4X4 Projection;
 	};
 
 public:
@@ -30,7 +30,7 @@ public:
 
 	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, int, DirectX::XMMATRIX, DirectX::XMMATRIX, DirectX::XMMATRIX);
+	bool Render(ID3D11DeviceContext*, int, DirectX::XMMATRIX&, DirectX::XMMATRIX&, DirectX::XMMATRIX&);
 
 private:
 
@@ -38,7 +38,7 @@ private:
 	void ShutdownShader();
 	void OutputShaderErrorMessage(ID3DBlob*, HWND, WCHAR*);
 
-	bool SetShaderParameters(ID3D11DeviceContext*, DirectX::XMMATRIX, DirectX::XMMATRIX, DirectX::XMMATRIX);
+	bool SetShaderParameters(ID3D11DeviceContext*, DirectX::XMMATRIX&, DirectX::XMMATRIX&, DirectX::XMMATRIX&);
 	void RenderShader(ID3D11DeviceContext*, int);
 
 private:
