@@ -1,0 +1,42 @@
+
+Texture2D ShaderTexture;
+SamplerState SampleType;
+
+cbuffer LightBuffer
+{
+    float4 DiffuseColor;
+    float3 LightDirection;
+    float Padding;
+};
+
+struct PixelInputType
+{
+    float4 Position : SV_POSITION;
+    float2 Tex : TEXCOORD0;
+    float3 Normal : NORMAL;
+};
+
+float4 LightPixelShader(PixelInputType Input) : SV_TARGET
+{
+    float4 TextureColor;
+    float3 LightDir;
+    float LightIntensity;
+    float4 Color;
+
+    // 현재 좌표위치에서 픽셀 색상을 샘플링 함.
+    TextureColor = ShaderTexture.Sample(SampleType, Input.Tex);
+
+    // 라이트의 방향을 뒤집음.
+    LightDir = -LightDirection;
+    
+    // 픽셀의 라이트 총량을 계산.
+    LightIntensity = saturate(dot(Input.Normal, LightDir));
+
+    // Intensity와 디퓨즈 컬러를 기준으로 최종색상을 결정.
+    Color = saturate(DiffuseColor * LightIntensity);
+
+    // 색상과 픽셀의 색상을 곱해 픽셀의 최종색상을 결정.
+    Color = Color * TextureColor;
+
+    return Color;
+};

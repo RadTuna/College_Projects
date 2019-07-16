@@ -10,7 +10,7 @@
 #include <fstream>
 
 
-class ColorShaderClass
+class LightShaderClass
 {
 private:
 
@@ -21,16 +21,23 @@ private:
 		DirectX::XMFLOAT4X4 View;
 		DirectX::XMFLOAT4X4 Projection;
 	};
+	
+	struct LightBufferType
+	{
+		DirectX::XMFLOAT4 DiffuseColor;
+		DirectX::XMFLOAT3 LightDirection;
+		float Padding;
+	};
 
 public:
 
-	ColorShaderClass();
-	ColorShaderClass(const ColorShaderClass&);
-	~ColorShaderClass();
+	LightShaderClass();
+	LightShaderClass(const LightShaderClass&);
+	~LightShaderClass();
 
 	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, int, DirectX::XMMATRIX&, DirectX::XMMATRIX&, DirectX::XMMATRIX&);
+	bool Render(ID3D11DeviceContext*, int, DirectX::XMMATRIX&, DirectX::XMMATRIX&, DirectX::XMMATRIX&, ID3D11ShaderResourceView*, DirectX::FXMVECTOR, DirectX::FXMVECTOR);
 
 private:
 
@@ -38,7 +45,7 @@ private:
 	void ShutdownShader();
 	void OutputShaderErrorMessage(ID3DBlob*, HWND, WCHAR*);
 
-	bool SetShaderParameters(ID3D11DeviceContext*, DirectX::XMMATRIX&, DirectX::XMMATRIX&, DirectX::XMMATRIX&);
+	bool SetShaderParameters(ID3D11DeviceContext*, DirectX::XMMATRIX&, DirectX::XMMATRIX&, DirectX::XMMATRIX&, ID3D11ShaderResourceView*, DirectX::FXMVECTOR, DirectX::FXMVECTOR);
 	void RenderShader(ID3D11DeviceContext*, int);
 
 private:
@@ -47,5 +54,7 @@ private:
 	ID3D11PixelShader* mPixelShader;
 	ID3D11InputLayout* mLayout;
 	ID3D11Buffer* mMatrixBuffer;
+	ID3D11SamplerState* mSampleState;
+	ID3D11Buffer* mLightBuffer;
 
 };

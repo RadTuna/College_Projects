@@ -8,6 +8,8 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 
+#include "TextureClass.h"
+
 
 class ModelClass
 {
@@ -17,7 +19,8 @@ private:
 	struct VertexType
 	{
 		DirectX::XMFLOAT3 Position;
-		DirectX::XMFLOAT4 Color;
+		DirectX::XMFLOAT2 Texture;
+		DirectX::XMFLOAT3 Normal;
 	};
 
 public:
@@ -26,23 +29,27 @@ public:
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	bool Initialize(ID3D11Device*); // 초기화
+	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, const char*); // 초기화
 	void Shutdown(); // 해제
 	void Render(ID3D11DeviceContext*); 
 
 	int GetIndexCount() const;
+	ID3D11ShaderResourceView* GetTexture() const;
 
 private:
 
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
+	bool LoadTexture(ID3D11Device*, ID3D11DeviceContext*, const char*);
+	void ReleaseTexture();
 	
 private:
 
 	// 각자 형식이 동일 하지만 Description으로 구분함.
 	ID3D11Buffer* mVertexBuffer;
 	ID3D11Buffer* mIndexBuffer;
+	TextureClass* mTexture;
 	int mVertexCount;
 	int mIndexCount;
 
