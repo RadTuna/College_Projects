@@ -7,6 +7,7 @@
 
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include <fstream>
 
 #include "TextureClass.h"
 
@@ -19,8 +20,15 @@ private:
 	struct VertexType
 	{
 		DirectX::XMFLOAT3 Position;
-		DirectX::XMFLOAT2 Texture;
+		DirectX::XMFLOAT2 Texture; // UV
 		DirectX::XMFLOAT3 Normal;
+	};
+
+	struct ModelType
+	{
+		float X, Y, Z; // 위치
+		float Tu, Tv; // 텍스쳐UV
+		float Nx, Ny, Nz; // 노말벡터
 	};
 
 public:
@@ -29,7 +37,7 @@ public:
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, const char*); // 초기화
+	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, const char*, const char*, bool IsFBX = false); // 초기화
 	void Shutdown(); // 해제
 	void Render(ID3D11DeviceContext*); 
 
@@ -41,8 +49,13 @@ private:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
+
 	bool LoadTexture(ID3D11Device*, ID3D11DeviceContext*, const char*);
 	void ReleaseTexture();
+
+	bool LoadModelTxt(const char*);
+	bool LoadFBXModel(const char*);
+	void ReleaseModel();
 	
 private:
 
@@ -52,6 +65,7 @@ private:
 	TextureClass* mTexture;
 	int mVertexCount;
 	int mIndexCount;
+	ModelType* mModel;
 
 };
 

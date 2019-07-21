@@ -303,7 +303,7 @@ bool D3DClass::Initialize(int ScreenWidth, int ScreenHeight, bool VSync, HWND hW
 
 	// 어떤 도형을 어떻게 그릴 것인지 결정하는 래스터화기 Description을 작성.
 	RasterDesc.AntialiasedLineEnable = false;
-	RasterDesc.CullMode = D3D11_CULL_BACK;
+	RasterDesc.CullMode = D3D11_CULL_BACK; // 임시로 Culling을 안하도록 설정.
 	RasterDesc.DepthBias = 0;
 	RasterDesc.DepthBiasClamp = 0.0f;
 	RasterDesc.DepthClipEnable = true;

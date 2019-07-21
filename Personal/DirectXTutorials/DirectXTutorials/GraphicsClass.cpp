@@ -46,7 +46,7 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 	}
 
 	// Camera의 초기위치를 설정.
-	mCamera->SetPosition(0.0f, 0.0f, -5.0f);
+	mCamera->SetPosition(0.0f, 0.0f, -50.0f);
 	
 	// Model 객체를 생성.
 	mModel = new ModelClass;
@@ -56,7 +56,7 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 	}
 
 	// Model 객체를 초기화.
-	Result = mModel->Initialize(mD3D->GetDevice(), mD3D->GetDeviceContext(), "../DirectXTutorials/Data/stone01.tga");
+	Result = mModel->Initialize(mD3D->GetDevice(), mD3D->GetDeviceContext(), "../DirectXTutorials/Data/stone01.tga", "../DirectXTutorials/Data/Pyramid.fbx", true);
 	if (Result == false)
 	{
 		MessageBox(hWnd, "Could not initialize Model object", "Error", MB_OK);
@@ -86,8 +86,8 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 	}
 
 	// Light 객체를 초기화.
-	mLight->SetDiffuseColor(0.0f, 1.0f, 0.0f, 1.0f);
-	mLight->SetDirection(0.0f, 0.0f, -1.0f);
+	mLight->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+	mLight->SetDirection(0.0f, 0.0f, 1.0f);
 
 	return true;
 }
@@ -138,10 +138,10 @@ void GraphicsClass::Shutdown()
 bool GraphicsClass::Frame()
 {
 	bool Result;
-	static float Rotation = 0.0f;
+	static float Rotation = 5.0f;
 
 	// 매 프레임 마다 Rotation변수를 수정.
-	Rotation += static_cast<float>(DirectX::XM_PI / 0.02f);
+	//Rotation += static_cast<float>(DirectX::XM_PI / 0.1f);
 	if (Rotation > 360.0f)
 	{
 		Rotation -= 360.0f;

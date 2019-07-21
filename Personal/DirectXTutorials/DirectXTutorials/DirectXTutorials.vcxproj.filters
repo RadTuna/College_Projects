@@ -1,89 +1,98 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="WinFramwork">
+      <UniqueIdentifier>{6a2d8888-355f-4897-9556-bacbad8be74a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="DirectX11">
+      <UniqueIdentifier>{3dc03bd3-f8fb-43f5-a0e1-4369a0e5f27d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="DirectX11\Header">
+      <UniqueIdentifier>{104924ce-6d6a-4da3-88b3-c57af01fc0fb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="셰이더">
+    <Filter Include="DirectX11\Source">
+      <UniqueIdentifier>{edc36c94-6c68-4e38-9486-f123f993971a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FBXParser">
+      <UniqueIdentifier>{b213f582-8631-471a-b400-3f2b7cddee4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
       <UniqueIdentifier>{eac14d25-136f-4b6e-80ce-73ce9697bfe6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="SystemClass.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>WinFramwork</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>WinFramwork</Filter>
     </ClCompile>
     <ClCompile Include="InputClass.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsClass.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="D3DClass.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelClass.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="CameraClass.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>WinFramwork</Filter>
     </ClCompile>
     <ClCompile Include="TextureClass.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>DirectX11\Source</Filter>
     </ClCompile>
-    <ClCompile Include="LightShaderClass.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="CameraClass.cpp">
+      <Filter>DirectX11\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DClass.cpp">
+      <Filter>DirectX11\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsClass.cpp">
+      <Filter>DirectX11\Source</Filter>
     </ClCompile>
     <ClCompile Include="LightClass.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>DirectX11\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="LightShaderClass.cpp">
+      <Filter>DirectX11\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelClass.cpp">
+      <Filter>DirectX11\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXParser.cpp">
+      <Filter>FBXParser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="InputClass.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsClass.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="D3DClass.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="SystemClass.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>WinFramwork</Filter>
     </ClInclude>
-    <ClInclude Include="ModelClass.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="InputClass.h">
+      <Filter>WinFramwork</Filter>
     </ClInclude>
     <ClInclude Include="CameraClass.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>DirectX11\Header</Filter>
     </ClInclude>
-    <ClInclude Include="TextureClass.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="D3DClass.h">
+      <Filter>DirectX11\Header</Filter>
     </ClInclude>
-    <ClInclude Include="LightShaderClass.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="GraphicsClass.h">
+      <Filter>DirectX11\Header</Filter>
     </ClInclude>
     <ClInclude Include="LightClass.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>DirectX11\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="LightShaderClass.h">
+      <Filter>DirectX11\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelClass.h">
+      <Filter>DirectX11\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureClass.h">
+      <Filter>DirectX11\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXParser.h">
+      <Filter>FBXParser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Light.vs">
-      <Filter>셰이더</Filter>
+      <Filter>Shader</Filter>
     </None>
     <None Include="Light.ps">
-      <Filter>셰이더</Filter>
+      <Filter>Shader</Filter>
     </None>
   </ItemGroup>
 </Project>
