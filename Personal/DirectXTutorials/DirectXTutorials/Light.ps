@@ -4,9 +4,11 @@ SamplerState SampleType;
 
 cbuffer LightBuffer
 {
+    float4 AmbientColor;
     float4 DiffuseColor;
     float3 LightDirection;
-    float Padding;
+    float SpecularPower;
+    float4 SpecularColor;
 };
 
 struct PixelInputType
@@ -14,6 +16,7 @@ struct PixelInputType
     float4 Position : SV_POSITION;
     float2 Tex : TEXCOORD0;
     float3 Normal : NORMAL;
+    float3 ViewDirection : TEXCOORD1;
 };
 
 float4 LightPixelShader(PixelInputType Input) : SV_TARGET
@@ -22,21 +25,44 @@ float4 LightPixelShader(PixelInputType Input) : SV_TARGET
     float3 LightDir;
     float LightIntensity;
     float4 Color;
+    float3 Reflection;
+    float4 Specular;
 
     // 현재 좌표위치에서 픽셀 색상을 샘플링 함.
     TextureColor = ShaderTexture.Sample(SampleType, Input.Tex);
 
+    // 기본 픽셀 색상을 주변광의 값으로 지정.
+    Color = AmbientColor;
+
+    // 스펙큘러값을 초기화.
+    Specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
     // 라이트의 방향을 뒤집음.
-    LightDir = -LightDirection;
+    LightDir = -normalize(LightDirection);
     
     // 픽셀의 라이트 총량을 계산.
     LightIntensity = saturate(dot(Input.Normal, LightDir));
 
-    // Intensity와 디퓨즈 컬러를 기준으로 최종색상을 결정.
-    Color = saturate(DiffuseColor * LightIntensity);
+    if (LightIntensity > 0.0f)
+    {
+        // Intensity와 디퓨즈 컬러를 기준으로 최종색상을 결정.
+        Color += saturate(DiffuseColor * LightIntensity);
+
+        // 색상값이 1을 초과할 수 있으므로 saturate함수를 사용.
+        Color = saturate(Color);
+
+        // Intensity, 노말벡터, 라이트방향을 바탕으로 리플렉션 벡터를 계산.
+        Reflection = normalize(LightIntensity * (Input.Normal - LightDir));
+
+        // 반사벡터, 뷰벡터, 스펙큘러파워를 바탕으로 스펙큘러 라이트를 계산.
+        Specular = pow(saturate(dot(Reflection, Input.ViewDirection)), SpecularPower);
+    }
 
     // 색상과 픽셀의 색상을 곱해 픽셀의 최종색상을 결정.
     Color = Color * TextureColor;
+
+    // 스펙큘러 라이트 값을 마지막에 입력함.
+    Color = saturate(Color + Specular);
 
     return Color;
 };

@@ -6,6 +6,13 @@ cbuffer MatrixBuffer
     matrix ProjectionMatrix;
 };
 
+// 스펙큘러 라이트의 계산을 위해 카메라의 위치가 필요.
+cbuffer CameraBuffer
+{
+    float3 CameraPosition;
+    float Padding;
+};
+
 struct VertexInputType
 {
     float4 Position : POSITION;
@@ -18,12 +25,14 @@ struct PixelInputType
     float4 Position : SV_POSITION;
     float2 Tex : TEXCOORD0;
     float3 Normal : NORMAL;
+    float3 VeiwDirection : TEXCOORD1;
 };
 
 
 PixelInputType LightVertexShader(VertexInputType Input)
 {
     PixelInputType Output;
+    float4 WorldPosition;
 
     // 올바른 행렬연산을 위해 4개의 요소를 가지는 행렬을 만듦
     Input.Position.w = 1.0f;
@@ -41,6 +50,15 @@ PixelInputType LightVertexShader(VertexInputType Input)
 
     // 노말 벡터를 정규화.
     Output.Normal = normalize(Output.Normal);
+
+    // 월드 행렬과 연산해 월드 좌표계에서의 버텍스 위치를 찾음.
+    WorldPosition = mul(Input.Position, WorldMatrix);
+
+    // 카메라의 위치와 버텍스 위치를 기준으로 뷰 방향을 결정.
+    Output.VeiwDirection = CameraPosition.xyz - WorldPosition.xyz;
+
+    // 뷰 벡터를 정규화.
+    Output.VeiwDirection = normalize(Output.VeiwDirection);
 
     return Output;
 }

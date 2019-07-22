@@ -46,7 +46,8 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 	}
 
 	// Camera의 초기위치를 설정.
-	mCamera->SetPosition(0.0f, 0.0f, -50.0f);
+	mCamera->SetPosition(0.0f, 5.0f, -8.0f);
+	mCamera->SetRotation(30.0f, 0.0f, 0.0f);
 	
 	// Model 객체를 생성.
 	mModel = new ModelClass;
@@ -56,7 +57,7 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 	}
 
 	// Model 객체를 초기화.
-	Result = mModel->Initialize(mD3D->GetDevice(), mD3D->GetDeviceContext(), "../DirectXTutorials/Data/stone01.tga", "../DirectXTutorials/Data/Pyramid.fbx", true);
+	Result = mModel->Initialize(mD3D->GetDevice(), mD3D->GetDeviceContext(), "../DirectXTutorials/Data/stone01.tga", "../DirectXTutorials/Data/cube.txt", false);
 	if (Result == false)
 	{
 		MessageBox(hWnd, "Could not initialize Model object", "Error", MB_OK);
@@ -86,8 +87,11 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 	}
 
 	// Light 객체를 초기화.
-	mLight->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-	mLight->SetDirection(0.0f, 0.0f, 1.0f);
+	mLight->SetAmbientColor(0.1f, 0.1f, 0.1f, 1.0f);
+	mLight->SetDiffuseColor(0.5f, 0.5f, 0.5f, 1.0f);
+	mLight->SetDirection(0.0f, -1.0f, 1.0f);
+	mLight->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+	mLight->SetSpecularPower(1.0f);
 
 	return true;
 }
@@ -141,7 +145,7 @@ bool GraphicsClass::Frame()
 	static float Rotation = 5.0f;
 
 	// 매 프레임 마다 Rotation변수를 수정.
-	//Rotation += static_cast<float>(DirectX::XM_PI / 0.1f);
+	Rotation += static_cast<float>(DirectX::XM_PI * 0.005f);
 	if (Rotation > 360.0f)
 	{
 		Rotation -= 360.0f;
@@ -184,7 +188,8 @@ bool GraphicsClass::Render(float Rotation)
 
 	// TextureShader를 사용해 모델을 렌더링.
 	Result = mLightShader->Render(mD3D->GetDeviceContext(), mModel->GetIndexCount(), 
-		WorldMat, ViewMat, ProjectionMat, mModel->GetTexture(), mLight->GetDirection(), mLight->GetDiffuseColor());
+		WorldMat, ViewMat, ProjectionMat, mModel->GetTexture(), mLight->GetDirection(), mLight->GetDiffuseColor(), mLight->GetAmbientColor(),
+		mCamera->GetPostion(), mLight->GetSpecularColor(), mLight->GetSpecularPower());
 	if (Result == false)
 	{
 		return false;
