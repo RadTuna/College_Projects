@@ -46,7 +46,7 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 	}
 
 	// Camera의 초기위치를 설정.
-	mCamera->SetPosition(0.0f, 5.0f, -8.0f);
+	mCamera->SetPosition(0.0f, 30.0f, -40.0f);
 	mCamera->SetRotation(30.0f, 0.0f, 0.0f);
 	
 	// Model 객체를 생성.
@@ -56,8 +56,8 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 		return false;
 	}
 
-	// Model 객체를 초기화.
-	Result = mModel->Initialize(mD3D->GetDevice(), mD3D->GetDeviceContext(), "../DirectXTutorials/Data/stone01.tga", "../DirectXTutorials/Data/cube.txt", false);
+	// Model 객체를 초기화 // IsFBX = true : fbx경로입력 // IsFBX = false : txt경로입력
+	Result = mModel->Initialize(mD3D->GetDevice(), mD3D->GetDeviceContext(), "../DirectXTutorials/Data/stone01.tga", "../DirectXTutorials/Data/Teapot.fbx", true);
 	if (Result == false)
 	{
 		MessageBox(hWnd, "Could not initialize Model object", "Error", MB_OK);

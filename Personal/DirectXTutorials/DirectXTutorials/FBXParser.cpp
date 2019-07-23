@@ -91,17 +91,19 @@ bool FBXParser::ImportScene()
 		return false;
 	}
 
-	LoadNode(RootNode);
-
-	// 좌표계를 가져옴.
+	// 씬의 좌표계를 변경함. // 동작을 제대로 안하는 것 같음.
 	FbxAxisSystem SceneAxisSystem = mFbxScene->GetGlobalSettings().GetAxisSystem();
+	FbxAxisSystem OurAxisSystem(FbxAxisSystem::eDirectX);
+	if (SceneAxisSystem != OurAxisSystem)
+	{
+		OurAxisSystem.ConvertScene(mFbxScene);
+	}
 
-	// DirectX에 맞춰서 좌표계를 변환함.
-	FbxAxisSystem::DirectX.ConvertScene(mFbxScene);
-
-	// 씬에서 트라이앵글로 변환한 수 있는 모든 노드를 변환함.
+	// 씬에서 트라이앵글로 변환할 수 있는 모든 노드를 변환함.
 	FbxGeometryConverter GerometryConverter(mFbxManager);
 	GerometryConverter.Triangulate(mFbxScene, true);
+
+	LoadNode(RootNode);
 
 	return true;
 
@@ -388,50 +390,43 @@ DirectX::XMVECTOR FBXParser::ReadUV(const FbxMesh* InMesh, int ControlPointIndex
 
 	switch (TextureUV->GetMappingMode())
 	{
-	case FbxGeometryElement::eByControlPoint:
-	{
-		switch (TextureUV->GetReferenceMode())
+		case FbxGeometryElement::eByControlPoint:
 		{
-		case FbxGeometryElement::eDirect:
-		{
-			ResultUV = DirectX::XMVectorSet(
-				static_cast<float>(TextureUV->GetDirectArray().GetAt(ControlPointIndex).mData[0]),
-				static_cast<float>(TextureUV->GetDirectArray().GetAt(ControlPointIndex).mData[1]), 0.0f, 0.0f);
+			switch (TextureUV->GetReferenceMode())
+			{
+				case FbxGeometryElement::eDirect:
+				{
+					ResultUV = DirectX::XMVectorSet(
+						static_cast<float>(TextureUV->GetDirectArray().GetAt(ControlPointIndex).mData[0]),
+						static_cast<float>(TextureUV->GetDirectArray().GetAt(ControlPointIndex).mData[1]), 0.0f, 0.0f);
+					break;
+				}
+				case FbxGeometryElement::eIndexToDirect:
+				{
+					int Index = TextureUV->GetIndexArray().GetAt(ControlPointIndex);
+					ResultUV = DirectX::XMVectorSet(
+						static_cast<float>(TextureUV->GetDirectArray().GetAt(Index).mData[0]),
+						static_cast<float>(TextureUV->GetDirectArray().GetAt(Index).mData[1]), 0.0f, 0.0f);
+					break;
+				}
+			}
 			break;
 		}
-		case FbxGeometryElement::eIndexToDirect:
+		case FbxGeometryElement::eByPolygonVertex:
 		{
-			int Index = TextureUV->GetIndexArray().GetAt(ControlPointIndex);
-			ResultUV = DirectX::XMVectorSet(
-				static_cast<float>(TextureUV->GetDirectArray().GetAt(Index).mData[0]),
-				static_cast<float>(TextureUV->GetDirectArray().GetAt(Index).mData[1]), 0.0f, 0.0f);
+			switch (TextureUV->GetReferenceMode())
+			{
+				case FbxGeometryElement::eDirect:
+				case FbxGeometryElement::eIndexToDirect:
+				{
+					ResultUV = DirectX::XMVectorSet(
+						static_cast<float>(TextureUV->GetDirectArray().GetAt(TextureCounter).mData[0]),
+						static_cast<float>(TextureUV->GetDirectArray().GetAt(TextureCounter).mData[1]), 0.0f, 0.0f);
+					break;
+				}
+			}
 			break;
 		}
-		}
-		break;
-	}
-	case FbxGeometryElement::eByPolygonVertex:
-	{
-		switch (TextureUV->GetReferenceMode())
-		{
-		case FbxGeometryElement::eDirect:
-		{
-			ResultUV = DirectX::XMVectorSet(
-				static_cast<float>(TextureUV->GetDirectArray().GetAt(TextureCounter).mData[0]),
-				static_cast<float>(TextureUV->GetDirectArray().GetAt(TextureCounter).mData[1]), 0.0f, 0.0f);
-			break;
-		}
-		case FbxGeometryElement::eIndexToDirect:
-		{
-			int Index = TextureUV->GetIndexArray().GetAt(TextureCounter);
-			ResultUV = DirectX::XMVectorSet(
-				static_cast<float>(TextureUV->GetDirectArray().GetAt(Index).mData[0]),
-				static_cast<float>(TextureUV->GetDirectArray().GetAt(Index).mData[1]), 0.0f, 0.0f);
-			break;
-		}
-		}
-		break;
-	}
 	}
 
 	return ResultUV;
@@ -441,13 +436,23 @@ DirectX::XMVECTOR FBXParser::ReadUV(const FbxMesh* InMesh, int ControlPointIndex
 // 내부에 사용하는 정보에 변경점이 생기면 이 부분을 수정하면 됨.
 void FBXParser::StoreVertexData(FBXVertex& InVertex, int VertexCount)
 {
-	mFBXVertices[VertexCount].Position = InVertex.Position;
+	DirectX::XMMATRIX RotationMatrix = DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(-90.f), DirectX::XMConvertToRadians(0.0f), DirectX::XMConvertToRadians(0.0f));
+
+	DirectX::XMStoreFloat3(&mFBXVertices[VertexCount].Position, DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&InVertex.Position), RotationMatrix));
+	DirectX::XMStoreFloat3(&mFBXVertices[VertexCount].Normal, DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&InVertex.Normal), RotationMatrix));
+	DirectX::XMStoreFloat3(&mFBXVertices[VertexCount].Binormal, DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&InVertex.Binormal), RotationMatrix));
+	DirectX::XMStoreFloat3(&mFBXVertices[VertexCount].Tangnet, DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&InVertex.Tangnet), RotationMatrix));
+	DirectX::XMStoreFloat2(&mFBXVertices[VertexCount].UV, DirectX::XMVector2TransformCoord(DirectX::XMLoadFloat2(&InVertex.UV), RotationMatrix));
+
+	/*
 	mFBXVertices[VertexCount].Normal = InVertex.Normal;
 	mFBXVertices[VertexCount].Binormal = InVertex.Binormal;
 	mFBXVertices[VertexCount].Tangnet = InVertex.Tangnet;
 	mFBXVertices[VertexCount].UV = InVertex.UV;
+	*/
 
-	mVertexCount = mIndexCount = VertexCount;
+	// 이 카운트 값으로 새로운 배열을 생성하기에 +1을 해야함.
+	mIndexCount = mVertexCount = VertexCount + 1;
 }
 
 void FBXParser::Release()

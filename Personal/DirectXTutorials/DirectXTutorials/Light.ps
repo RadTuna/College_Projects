@@ -58,8 +58,8 @@ float4 LightPixelShader(PixelInputType Input) : SV_TARGET
         Specular = pow(saturate(dot(Reflection, Input.ViewDirection)), SpecularPower);
     }
 
-    // 색상과 픽셀의 색상을 곱해 픽셀의 최종색상을 결정.
-    Color = Color * TextureColor;
+    // 색상과 픽셀의 색상을 곱해 픽셀의 최종색상을 결정. // 현재 텍스쳐 사용 X
+    // Color = Color * TextureColor;
 
     // 스펙큘러 라이트 값을 마지막에 입력함.
     Color = saturate(Color + Specular);
