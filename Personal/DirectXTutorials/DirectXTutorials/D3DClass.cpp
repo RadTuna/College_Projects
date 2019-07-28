@@ -12,6 +12,7 @@ D3DClass::D3DClass()
 	mDepthStencilState = nullptr;
 	mDepthStencilView = nullptr;
 	mRasterState = nullptr;
+	mDepthDisabledStencilState = nullptr;
 }
 
 D3DClass::D3DClass(const D3DClass& Other)
@@ -42,6 +43,7 @@ bool D3DClass::Initialize(int ScreenWidth, int ScreenHeight, bool VSync, HWND hW
 	D3D11_DEPTH_STENCIL_VIEW_DESC DepthStencilViewDesc;
 	D3D11_RASTERIZER_DESC RasterDesc;
 	D3D11_VIEWPORT ViewPort;
+	D3D11_DEPTH_STENCIL_DESC DepthDisableStencilDesc;
 	float FieldOfView;
 	float ScreenAspect;
 
@@ -348,6 +350,33 @@ bool D3DClass::Initialize(int ScreenWidth, int ScreenHeight, bool VSync, HWND hW
 	// 2D 렌더링에 사용 될 직교 투영 행렬을 생성함.
 	DirectX::XMStoreFloat4x4(&mOrthoMatrix, DirectX::XMMatrixOrthographicLH(static_cast<float>(ScreenWidth), static_cast<float>(ScreenHeight), ScreenNear, ScreenDepth));
 
+	// 두번째 깊이-스텐실 상태변수를 초기화.
+	ZeroMemory(&DepthDisableStencilDesc, sizeof(DepthDisableStencilDesc));
+
+	// 2D 렌더링을 위한 Z버퍼가 꺼진 두번째 깊이-스텐실 상태를 생성.
+	// DepthEnalble이 false인 것을 제외하면 모두 동일함.
+	DepthDisableStencilDesc.DepthEnable = false;
+	DepthDisableStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	DepthDisableStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	DepthDisableStencilDesc.StencilEnable = true;
+	DepthDisableStencilDesc.StencilReadMask = 0xFF;
+	DepthDisableStencilDesc.StencilWriteMask = 0xFF;
+	DepthDisableStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	DepthDisableStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	DepthDisableStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	DepthDisableStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	DepthDisableStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	DepthDisableStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	DepthDisableStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	DepthDisableStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	// 깊이-스텐실 상태를 생성.
+	Result = mDevice->CreateDepthStencilState(&DepthDisableStencilDesc, &mDepthDisabledStencilState);
+	if (FAILED(Result))
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -357,6 +386,12 @@ void D3DClass::Shutdown()
 	if (mSwapChain != nullptr)
 	{
 		mSwapChain->SetFullscreenState(false, nullptr);
+	}
+
+	if (mDepthDisabledStencilState != nullptr)
+	{
+		mDepthDisabledStencilState->Release();
+		mDepthDisabledStencilState = nullptr;
 	}
 
 	if (mRasterState != nullptr)
@@ -468,6 +503,18 @@ void D3DClass::GetVideoCardInfo(char* CardName, int& Memory)
 {
 	strcpy_s(CardName, 128, mVideoCardDescription);
 	Memory = mVideoCardMemory;
+	return;
+}
+
+void D3DClass::TurnZBufferOn()
+{
+	mDeviceContext->OMSetDepthStencilState(mDepthStencilState, 1);
+	return;
+}
+
+void D3DClass::TurnZBufferOff()
+{
+	mDeviceContext->OMSetDepthStencilState(mDepthDisabledStencilState, 1);
 	return;
 }
 

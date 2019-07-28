@@ -54,6 +54,9 @@
     <ClCompile Include="FBXParser.cpp">
       <Filter>FBXParser</Filter>
     </ClCompile>
+    <ClCompile Include="BitmapClass.cpp">
+      <Filter>DirectX11\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="FBXParser.h">
       <Filter>FBXParser</Filter>
+    </ClInclude>
+    <ClInclude Include="BitmapClass.h">
+      <Filter>DirectX11\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

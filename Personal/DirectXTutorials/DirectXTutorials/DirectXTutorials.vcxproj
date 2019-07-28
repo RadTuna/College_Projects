@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BitmapClass.cpp" />
     <ClCompile Include="CameraClass.cpp" />
     <ClCompile Include="FBXParser.cpp" />
     <ClCompile Include="LightClass.cpp" />
@@ -143,6 +144,7 @@
     <ClCompile Include="TextureClass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BitmapClass.h" />
     <ClInclude Include="CameraClass.h" />
     <ClInclude Include="FBXParser.h" />
     <ClInclude Include="LightClass.h" />

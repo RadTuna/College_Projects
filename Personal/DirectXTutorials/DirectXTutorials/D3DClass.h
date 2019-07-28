@@ -36,6 +36,9 @@ public:
 
 	void GetVideoCardInfo(char*, int&);
 
+	void TurnZBufferOn();
+	void TurnZBufferOff();
+
 private:
 
 	bool mVSyncEnabled;
@@ -52,6 +55,7 @@ private:
 	DirectX::XMFLOAT4X4 mProjectionMatrix;
 	DirectX::XMFLOAT4X4 mWorldMatrix;
 	DirectX::XMFLOAT4X4 mOrthoMatrix;
+	ID3D11DepthStencilState* mDepthDisabledStencilState;
 
 };
 

@@ -6,6 +6,7 @@
 #include "LightShaderClass.h"
 #include "ModelClass.h"
 #include "LightClass.h"
+#include "BitmapClass.h"
 
 
 const bool FULL_SCREEN = false;
@@ -36,6 +37,7 @@ private:
 	ModelClass* mModel;
 	LightShaderClass* mLightShader;
 	LightClass* mLight;
+	BitmapClass* mBitmap;
 
 };
 

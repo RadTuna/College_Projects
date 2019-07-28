@@ -382,6 +382,29 @@ bool LightShaderClass::SetShaderParameters(ID3D11DeviceContext* DeviceContext,
 	// 마지막으로 정점 셰이더의 버퍼를 바뀐값으로 바꿈.
 	DeviceContext->VSSetConstantBuffers(BufferNumber, 1, &mMatrixBuffer);
 
+	// 카메라 상수 버퍼을 수정할 수 있도록 잠금.
+	Result = DeviceContext->Map(mCameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
+	if (FAILED(Result))
+	{
+		return false;
+	}
+
+	// 카메라 상수 버퍼에 대한 포인터를 가져옴.
+	CameraDataPtr = reinterpret_cast<CameraBufferType*>(MappedResource.pData);
+
+	// 카메라 상수 버퍼에 라이트 관련 변수의 내용을 넣음.
+	DirectX::XMStoreFloat3(&CameraDataPtr->CameraPosition, CameraPosition);
+	CameraDataPtr->Padding = 0.0f;
+
+	// 카메라 상수 버퍼의 잠금을 품.
+	DeviceContext->Unmap(mCameraBuffer, 0);
+
+	// 카메라 셰이더에서 라이트 상수 버퍼에 대한 위치를 설정.
+	BufferNumber = 1;
+
+	// 카메라 셰이더의 라이트 상수 버퍼의 값을 설정.
+	DeviceContext->VSSetConstantBuffers(BufferNumber, 1, &mCameraBuffer);
+
 	// 픽셀 셰이더에 셰이더 텍스쳐 리소스를 할당.
 	DeviceContext->PSSetShaderResources(0, 1, &Texture);
 
@@ -410,29 +433,6 @@ bool LightShaderClass::SetShaderParameters(ID3D11DeviceContext* DeviceContext,
 
 	// 픽셀 셰이더의 라이트 상수 버퍼의 값을 설정.
 	DeviceContext->PSSetConstantBuffers(BufferNumber, 1, &mLightBuffer);
-
-	// 카메라 상수 버퍼을 수정할 수 있도록 잠금.
-	Result = DeviceContext->Map(mCameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
-	if (FAILED(Result))
-	{
-		return false;
-	}
-	
-	// 카메라 상수 버퍼에 대한 포인터를 가져옴.
-	CameraDataPtr = reinterpret_cast<CameraBufferType*>(MappedResource.pData);
-
-	// 카메라 상수 버퍼에 라이트 관련 변수의 내용을 넣음.
-	DirectX::XMStoreFloat3(&CameraDataPtr->CameraPosition, CameraPosition);
-	CameraDataPtr->Padding = 0.0f;
-
-	// 카메라 상수 버퍼의 잠금을 품.
-	DeviceContext->Unmap(mCameraBuffer, 0);
-
-	// 픽셀 셰이더에서 라이트 상수 버퍼에 대한 위치를 설정.
-	BufferNumber = 1;
-
-	// 픽셀 셰이더의 라이트 상수 버퍼의 값을 설정.
-	DeviceContext->PSSetConstantBuffers(BufferNumber, 1, &mCameraBuffer);
 
 	return true;
 }
