@@ -10,6 +10,7 @@ GraphicsClass::GraphicsClass()
 	mLightShader = nullptr;
 	mLight = nullptr;
 	mBitmap = nullptr;
+	mText = nullptr;
 }
 
 GraphicsClass::GraphicsClass(const GraphicsClass&)
@@ -23,6 +24,7 @@ GraphicsClass::~GraphicsClass()
 bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 {
 	bool Result;
+	DirectX::XMMATRIX BaseViewMatrix;
 
 	// Direct3D 객체를 생성.
 	mD3D = new D3DClass;
@@ -49,6 +51,23 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 	// Camera의 초기위치를 설정.
 	mCamera->SetPosition(0.0f, 0.0f, -10.0f);
 	mCamera->SetRotation(0.0f, 0.0f, 0.0f);
+	mCamera->Render();
+	BaseViewMatrix = mCamera->GetViewMatrix();
+
+	// 텍스트 객체를 생성.
+	mText = new TextClass;
+	if (mText == nullptr)
+	{
+		return false;
+	}
+
+	// 텍스트 객체를 초기화.
+	Result = mText->Initialize(mD3D->GetDevice(), mD3D->GetDeviceContext(), hWnd, ScreenWidth, ScreenHeight, BaseViewMatrix);
+	if (Result == false)
+	{
+		MessageBox(hWnd, "Could not initialize the text object", "Error", MB_OK);
+		return false;
+	}
 	
 	// Model 객체를 생성.
 	mModel = new ModelClass;
@@ -145,6 +164,14 @@ void GraphicsClass::Shutdown()
 		mModel = nullptr;
 	}
 
+	// Text 객체를 반환.
+	if (mText != nullptr)
+	{
+		mText->Shutdown();
+		delete mText;
+		mText = nullptr;
+	}
+
 	// Camera 객체를 반환.
 	if (mCamera != nullptr)
 	{
@@ -209,6 +236,16 @@ bool GraphicsClass::Render(float Rotation)
 	// 2D 렌더링을 시작하기 이전에 Z버퍼를 끔.
 	mD3D->TurnZBufferOff();
 
+	// 렌더링을 시작하기 이전에 알파 블렌딩를 활성화.
+	mD3D->TurnOnAlphaBlending();
+
+	// 텍스트 문자열을 렌더링.
+	Result = mText->Render(mD3D->GetDeviceContext(), WorldMat, OrthoMat);
+	if (Result == false)
+	{
+		return false;
+	}
+
 	// 비트맵 버텍스와 인덱스 버퍼를 그래픽 파이프라인에 배치하며 드로우를 준비.
 	Result = mBitmap->Render(mD3D->GetDeviceContext(), 200, -200);
 	if (Result == false)
@@ -224,6 +261,9 @@ bool GraphicsClass::Render(float Rotation)
 	{
 		return false;
 	}
+
+	// 렌더링이 종료 되었으면 알파 블렌딩을 비활성화.
+	mD3D->TurnOffAlphaBlending();
 
 	// 2D 렌더링이 종료 되었으면 Z버퍼를 끔.
 	mD3D->TurnZBufferOn();

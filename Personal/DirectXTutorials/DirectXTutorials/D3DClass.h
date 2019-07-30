@@ -39,6 +39,9 @@ public:
 	void TurnZBufferOn();
 	void TurnZBufferOff();
 
+	void TurnOnAlphaBlending();
+	void TurnOffAlphaBlending();
+
 private:
 
 	bool mVSyncEnabled;
@@ -56,6 +59,8 @@ private:
 	DirectX::XMFLOAT4X4 mWorldMatrix;
 	DirectX::XMFLOAT4X4 mOrthoMatrix;
 	ID3D11DepthStencilState* mDepthDisabledStencilState;
+	ID3D11BlendState* mAlphaEnableBlendingState;
+	ID3D11BlendState* mAlphaDisableBlendingState;
 
 };
 

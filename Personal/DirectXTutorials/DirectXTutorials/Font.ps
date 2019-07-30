@@ -1,0 +1,33 @@
+
+Texture2D ShaderTexture;
+SamplerState SampleType;
+
+cbuffer PixelBuffer
+{
+    float4 PixelColor;    
+};
+
+struct PixelInputType
+{
+    float4 Position : SV_POSITION;
+    float2 Tex : TEXCOORD0;
+};
+
+float4 FontPixelShader(PixelInputType Input) : SV_TARGET
+{
+    float4 Color;
+
+    Color = ShaderTexture.Sample(SampleType, Input.Tex);
+
+    if (Color.r == 0.0f)
+    {
+        Color.a = 0.0f;    
+    }
+    else
+    {
+        Color.a = 1.0f;
+        Color = Color * PixelColor;
+    }
+
+    return Color;
+}

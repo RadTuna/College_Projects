@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="WinFramwork">
-      <UniqueIdentifier>{6a2d8888-355f-4897-9556-bacbad8be74a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="DirectX11">
       <UniqueIdentifier>{3dc03bd3-f8fb-43f5-a0e1-4369a0e5f27d}</UniqueIdentifier>
     </Filter>
@@ -19,16 +16,19 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{eac14d25-136f-4b6e-80ce-73ce9697bfe6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="WinFramework">
+      <UniqueIdentifier>{6a2d8888-355f-4897-9556-bacbad8be74a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SystemClass.cpp">
-      <Filter>WinFramwork</Filter>
+      <Filter>WinFramework</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
-      <Filter>WinFramwork</Filter>
+      <Filter>WinFramework</Filter>
     </ClCompile>
     <ClCompile Include="InputClass.cpp">
-      <Filter>WinFramwork</Filter>
+      <Filter>WinFramework</Filter>
     </ClCompile>
     <ClCompile Include="TextureClass.cpp">
       <Filter>DirectX11\Source</Filter>
@@ -57,13 +57,22 @@
     <ClCompile Include="BitmapClass.cpp">
       <Filter>DirectX11\Source</Filter>
     </ClCompile>
+    <ClCompile Include="FontClass.cpp">
+      <Filter>DirectX11\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="FontShaderClass.cpp">
+      <Filter>DirectX11\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="TextClass.cpp">
+      <Filter>DirectX11\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
-      <Filter>WinFramwork</Filter>
+      <Filter>WinFramework</Filter>
     </ClInclude>
     <ClInclude Include="InputClass.h">
-      <Filter>WinFramwork</Filter>
+      <Filter>WinFramework</Filter>
     </ClInclude>
     <ClInclude Include="CameraClass.h">
       <Filter>DirectX11\Header</Filter>
@@ -92,12 +101,27 @@
     <ClInclude Include="BitmapClass.h">
       <Filter>DirectX11\Header</Filter>
     </ClInclude>
+    <ClInclude Include="FontClass.h">
+      <Filter>DirectX11\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="FontShaderClass.h">
+      <Filter>DirectX11\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="TextClass.h">
+      <Filter>DirectX11\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Light.vs">
       <Filter>Shader</Filter>
     </None>
     <None Include="Light.ps">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Font.vs">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Font.ps">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
