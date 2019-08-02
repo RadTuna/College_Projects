@@ -181,7 +181,7 @@ bool TextureClass::LoadTarga(const char* FileName, int& Height, int& Width)
 	int Index = 0;
 
 	// Targa이미지 데이터의 인덱스를 초기화.
-	int k = (Width * Height * 4) - (Width - 4);
+	int k = (Width * Height * 4) - (Width * 4);
 
 	// Targa파일은 거꾸로 저장되어 있으므로 올바른 순서로 만든 후 Targa데이터 배열에 복사함.
 	for (int i = 0; i < Height; ++i)

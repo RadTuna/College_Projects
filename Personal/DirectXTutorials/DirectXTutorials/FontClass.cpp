@@ -148,7 +148,7 @@ void FontClass::BuildVertexArray(void* Vertices, const char* Sentence, float Dra
 	// 입력된 정점변수를 VertexType구조체로 강제 캐스팅.
 	VertexPtr = reinterpret_cast<VertexType*>(Vertices);
 	
-	// 문장내의 숫자문자를 얻음.
+	// 문장의 길이를 얻음.
 	NumLetters = static_cast<int>(strlen(Sentence));
 
 	// 버텍스 배열의 인덱스를 초기화.

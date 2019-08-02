@@ -36,6 +36,8 @@ public:
 	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, HWND, int, int, DirectX::FXMMATRIX);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, DirectX::XMMATRIX&, DirectX::XMMATRIX&);
+	bool SetFPS(int, ID3D11DeviceContext*);
+	bool SetCPU(int, ID3D11DeviceContext*);
 
 private:
 

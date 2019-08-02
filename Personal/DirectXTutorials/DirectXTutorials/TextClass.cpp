@@ -68,7 +68,7 @@ bool TextClass::Initialize(ID3D11Device* Device, ID3D11DeviceContext* DeviceCont
 	}
 
 	// 문장 버텍스 버퍼를 문자열 정보로 업데이트.
-	Result = UpdateSentence(mSentence1, "Hello", 100, 100, 1.0f, 1.0f, 1.0f, DeviceContext);
+	Result = UpdateSentence(mSentence1, "Test1", 100, 100, 1.0f, 1.0f, 1.0f, DeviceContext);
 	if (Result == false)
 	{
 		return false;
@@ -82,7 +82,7 @@ bool TextClass::Initialize(ID3D11Device* Device, ID3D11DeviceContext* DeviceCont
 	}
 
 	// 문장 버텍스 버퍼를 문자열 정보로 업데이트.
-	Result = UpdateSentence(mSentence2, "Goodbye", 100, 200, 1.0f, 1.0f, 0.0f, DeviceContext);
+	Result = UpdateSentence(mSentence2, "Test2", 100, 200, 1.0f, 1.0f, 0.0f, DeviceContext);
 	if (Result == false)
 	{
 		return false;
@@ -131,6 +131,86 @@ bool TextClass::Render(ID3D11DeviceContext* DeviceContext, DirectX::XMMATRIX& Wo
 
 	// 두번째 문장을 그림.
 	Result = RenderSentence(DeviceContext, mSentence2, WorldMatrix, OthoMatrix);
+	if (Result == false)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool TextClass::SetFPS(int FPS, ID3D11DeviceContext* DeviceContext)
+{
+	char TempString[16];
+	char FPSString[16];
+	float Red;
+	float Green;
+	float Blue;
+	bool Result;
+
+	// FPS 값을 10000미만으로 클리핑.
+	if (FPS > 9999)
+	{
+		FPS = 9999;
+	}
+
+	// FPS의 정수형을 문자열로 형변환.
+	_itoa_s(FPS, TempString, 10);
+
+	// FPS 문자열을 초기화.
+	strcpy_s(FPSString, "FPS: ");
+	strcat_s(FPSString, TempString);
+
+	// FPS가 60 이상이면 초록색
+	if (FPS >= 60)
+	{
+		Red = 0.0f;
+		Green = 1.0f;
+		Blue = 0.0f;
+	}
+
+	// FPS가 60 미만이면 노랑색
+	if (FPS < 60)
+	{
+		Red = 1.0f;
+		Green = 1.0f;
+		Blue = 0.0f;
+	}
+
+	// FPS가 30 미만이면 빨강색
+	if (FPS < 30)
+	{
+		Red = 1.0f;
+		Green = 0.0f;
+		Blue = 0.0f;
+	}
+
+	// 새 문장 정보로 버텍스 버퍼를 업데이트.
+	Result = UpdateSentence(mSentence1, FPSString, 20, 20, Red, Green, Blue, DeviceContext);
+	if (Result == false)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool TextClass::SetCPU(int CPU, ID3D11DeviceContext* DeviceContext)
+{
+	char TempString[16];
+	char CPUString[16];
+	bool Result;
+
+	// FPS의 정수형을 문자열로 형변환.
+	_itoa_s(CPU, TempString, 10);
+
+	// CPU 문자열을 초기화.
+	strcpy_s(CPUString, "CPU: ");
+	strcat_s(CPUString, TempString);
+	strcat_s(CPUString, "%");
+
+	// 새 문장 정보롤 버텍스 버퍼를 업데이트.
+	Result = UpdateSentence(mSentence2, CPUString, 20, 40, 0.0f, 1.0f, 0.0f, DeviceContext);
 	if (Result == false)
 	{
 		return false;

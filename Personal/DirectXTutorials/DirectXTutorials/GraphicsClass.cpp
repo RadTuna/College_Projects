@@ -49,8 +49,8 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 	}
 
 	// Camera의 초기위치를 설정.
-	mCamera->SetPosition(0.0f, 0.0f, -10.0f);
-	mCamera->SetRotation(0.0f, 0.0f, 0.0f);
+	mCamera->SetPosition(0.0f, 20.0f, -40.0f);
+	mCamera->SetRotation(20.0f, 0.0f, 0.0f);
 	mCamera->Render();
 	BaseViewMatrix = mCamera->GetViewMatrix();
 
@@ -190,10 +190,24 @@ void GraphicsClass::Shutdown()
 	return;
 }
 
-bool GraphicsClass::Frame()
+bool GraphicsClass::Frame(int FPS, int CPU, float FrameTime)
 {
 	bool Result;
 	static float Rotation = 5.0f;
+
+	// FPS를 설정.
+	Result = mText->SetFPS(FPS, mD3D->GetDeviceContext());
+	if (Result == false)
+	{
+		return false;
+	}
+
+	// CPU 사용량을 설정.
+	Result = mText->SetCPU(CPU, mD3D->GetDeviceContext());
+	if (Result == false)
+	{
+		return false;
+	}
 
 	// 매 프레임 마다 Rotation변수를 수정.
 	Rotation += static_cast<float>(DirectX::XM_PI * 0.005f);
@@ -233,9 +247,6 @@ bool GraphicsClass::Render(float Rotation)
 	ProjectionMat = mD3D->GetProjectionMatrix();
 	OrthoMat = mD3D->GetOrthoMatrix();
 
-	// 2D 렌더링을 시작하기 이전에 Z버퍼를 끔.
-	mD3D->TurnZBufferOff();
-
 	// 렌더링을 시작하기 이전에 알파 블렌딩를 활성화.
 	mD3D->TurnOnAlphaBlending();
 
@@ -253,21 +264,6 @@ bool GraphicsClass::Render(float Rotation)
 		return false;
 	}
 
-	// LightShader를 사용해 비트맵을 렌더링.
-	Result = mLightShader->Render(mD3D->GetDeviceContext(), mBitmap->GetIndexCount(), WorldMat, ViewMat, OrthoMat, mBitmap->GetTexture(),
-		DirectX::XMVectorZero(), DirectX::XMVectorZero(), DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f),
-		DirectX::XMVectorZero(), DirectX::XMVectorZero(), 1.0f);
-	if (Result == false)
-	{
-		return false;
-	}
-
-	// 렌더링이 종료 되었으면 알파 블렌딩을 비활성화.
-	mD3D->TurnOffAlphaBlending();
-
-	// 2D 렌더링이 종료 되었으면 Z버퍼를 끔.
-	mD3D->TurnZBufferOn();
-
 	// 모델이 회전하도록 Rotation변수를 이용해 월드 행렬을 회전함.
 	WorldMat = DirectX::XMMatrixRotationY(Rotation);
 
@@ -275,13 +271,16 @@ bool GraphicsClass::Render(float Rotation)
 	mModel->Render(mD3D->GetDeviceContext());
 
 	// LightShader를 사용해 모델을 렌더링.
-	Result = mLightShader->Render(mD3D->GetDeviceContext(), mModel->GetIndexCount(), 
+	Result = mLightShader->Render(mD3D->GetDeviceContext(), mModel->GetIndexCount(),
 		WorldMat, ViewMat, ProjectionMat, mModel->GetTexture(), mLight->GetDirection(), mLight->GetDiffuseColor(), mLight->GetAmbientColor(),
 		mCamera->GetPostion(), mLight->GetSpecularColor(), mLight->GetSpecularPower());
 	if (Result == false)
 	{
 		return false;
 	}
+
+	// 렌더링이 종료 되었으면 알파 블렌딩을 비활성화.
+	mD3D->TurnOffAlphaBlending();
 
 	// 버퍼에 그려진 씬을 화면에 표시함.
 	mD3D->EndScene();

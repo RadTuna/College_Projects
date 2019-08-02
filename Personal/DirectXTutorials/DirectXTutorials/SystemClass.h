@@ -8,6 +8,9 @@
 
 #include "InputClass.h"
 #include "GraphicsClass.h"
+#include "CPUClass.h"
+#include "FPSClass.h"
+#include "TimerClass.h"
 
 
 class SystemClass
@@ -38,6 +41,10 @@ private:
 
 	InputClass* mInput;
 	GraphicsClass* mGraphics;
+
+	FPSClass* mFPS;
+	CPUClass* mCPU;
+	TimerClass* mTimer;
 
 };
 

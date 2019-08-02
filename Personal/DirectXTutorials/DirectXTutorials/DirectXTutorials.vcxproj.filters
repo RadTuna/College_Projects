@@ -19,6 +19,9 @@
     <Filter Include="WinFramework">
       <UniqueIdentifier>{6a2d8888-355f-4897-9556-bacbad8be74a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Profiler">
+      <UniqueIdentifier>{8aca66b5-15f4-488a-a38b-80c14983b5fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SystemClass.cpp">
@@ -66,6 +69,15 @@
     <ClCompile Include="TextClass.cpp">
       <Filter>DirectX11\Source</Filter>
     </ClCompile>
+    <ClCompile Include="CPUClass.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerClass.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="FPSClass.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -109,6 +121,15 @@
     </ClInclude>
     <ClInclude Include="TextClass.h">
       <Filter>DirectX11\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CPUClass.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerClass.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="FPSClass.h">
+      <Filter>Profiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

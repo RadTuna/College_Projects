@@ -5,6 +5,9 @@ SystemClass::SystemClass()
 {
 	mInput = nullptr;
 	mGraphics = nullptr;
+	mFPS = nullptr;
+	mCPU = nullptr;
+	mTimer = nullptr;
 }
 
 SystemClass::SystemClass(const SystemClass& Other)
@@ -52,11 +55,69 @@ bool SystemClass::Initialize()
 		return false;
 	}
 
+	// FPS 객체를 생성.
+	mFPS = new FPSClass;
+	if (mFPS == nullptr)
+	{
+		return false;
+	}
+
+	// FPS 객체를 초기화.
+	mFPS->Initialize();
+	
+	// CPU 객체를 생성.
+	mCPU = new CPUClass;
+	if (mCPU == nullptr)
+	{
+		return false;
+	}
+
+	// CPU 객체를 초기화.
+	mCPU->Initialize();
+
+	// 타이머 객체를 생성.
+	mTimer = new TimerClass;
+	if (mTimer == nullptr)
+	{
+		return false;
+	}
+
+	Result = mTimer->Initialize();
+	if (Result == false)
+	{
+		MessageBox(mhWnd, "Could not initialize the Timer object.", "Error", MB_OK);
+		return false;
+	}
+
+	return true;
+
 	return true;
 }
 
 void SystemClass::Shutdown()
 {
+	// 타이머 객체를 해제.
+	if (mTimer != nullptr)
+	{
+		delete mTimer;
+		mTimer = nullptr;
+	}
+
+	// CPU 객체를 해제.
+	if (mCPU != nullptr)
+	{
+		mCPU->Shutdown();
+		delete mCPU;
+		mCPU = nullptr;
+	}
+
+	// FPS 객체를 해제.
+	if (mFPS != nullptr)
+	{
+		delete mFPS;
+		mFPS = nullptr;
+	}
+
 	// Graphics 객체의 메모리를 해제.
 	if (mGraphics != nullptr)
 	{
@@ -127,13 +188,18 @@ bool SystemClass::Frame()
 {
 	bool Result;
 
+	// 시스템 상태를 업데이트.
+	mTimer->Frame();
+	mFPS->Frame();
+	mCPU->Frame();
+
 	// 유저가 ESC키를 눌러 어플리케이션을 종료를 원하는지 확인함.
 	if (mInput->IsKeyDown(VK_ESCAPE))
 	{
 		return false;
 	}
 
-	Result = mGraphics->Frame();
+	Result = mGraphics->Frame(mFPS->GetFPS(), mCPU->GetCpuPercentage(), mTimer->GetTime());
 	if (Result == false)
 	{
 		return false;
