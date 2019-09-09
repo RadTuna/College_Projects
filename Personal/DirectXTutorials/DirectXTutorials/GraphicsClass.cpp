@@ -49,8 +49,8 @@ bool GraphicsClass::Initialize(int ScreenWidth, int ScreenHeight, HWND hWnd)
 	}
 
 	// Camera의 초기위치를 설정.
-	mCamera->SetPosition(0.0f, 20.0f, -40.0f);
-	mCamera->SetRotation(20.0f, 0.0f, 0.0f);
+	mCamera->SetPosition(0.0f, 30.0f, -40.0f);
+	mCamera->SetRotation(30.0f, 0.0f, 0.0f);
 	mCamera->Render();
 	BaseViewMatrix = mCamera->GetViewMatrix();
 
@@ -210,7 +210,7 @@ bool GraphicsClass::Frame(int FPS, int CPU, float FrameTime)
 	}
 
 	// 매 프레임 마다 Rotation변수를 수정.
-	Rotation += static_cast<float>(DirectX::XM_PI * 0.005f);
+	Rotation += static_cast<float>(DirectX::XM_PI * 0.0005f) * FrameTime;
 	if (Rotation > 360.0f)
 	{
 		Rotation -= 360.0f;

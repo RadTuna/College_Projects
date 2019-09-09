@@ -52,7 +52,7 @@ float4 LightPixelShader(PixelInputType Input) : SV_TARGET
         Color = saturate(Color);
 
         // Intensity, 노말벡터, 라이트방향을 바탕으로 리플렉션 벡터를 계산.
-        Reflection = normalize(LightIntensity * (Input.Normal - LightDir));
+        Reflection = normalize(LightIntensity * (Input.Normal - LightDir)));
 
         // 반사벡터, 뷰벡터, 스펙큘러파워를 바탕으로 스펙큘러 라이트를 계산.
         Specular = pow(saturate(dot(Reflection, Input.ViewDirection)), SpecularPower);
