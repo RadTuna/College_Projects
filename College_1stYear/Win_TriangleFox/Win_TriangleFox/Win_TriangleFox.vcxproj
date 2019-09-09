@@ -126,6 +126,7 @@
     <ClCompile Include="GDIManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Rasterizer.cpp" />
+    <ClCompile Include="TimeCounter.cpp" />
     <ClCompile Include="TMath.cpp" />
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
@@ -133,6 +134,7 @@
     <ClInclude Include="CommonHeader.h" />
     <ClInclude Include="GDIManager.h" />
     <ClInclude Include="Rasterizer.h" />
+    <ClInclude Include="TimeCounter.h" />
     <ClInclude Include="TMath.h" />
     <ClInclude Include="Triangle.h" />
   </ItemGroup>

@@ -1,6 +1,7 @@
 #include "CommonHeader.h"
 #include "GDIManager.h"
 #include "Rasterizer.h"
+#include "TimeCounter.h"
 
 #define ScreenWidth 1920
 #define ScreenHeight 1080
@@ -67,6 +68,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	WinRasterizer->Initialize(WinGDIManager);
 	WinRasterizer->SetTriangleList();
 
+	TimeCounter* WinTimeCounter = new TimeCounter;
+	if (WinTimeCounter == nullptr) return 0;
+
+	if (WinTimeCounter->Initialize() == false) return 0;
+
+
 	// 5. 메시지 루프 
 	MSG Message;
 	
@@ -75,7 +82,13 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		TranslateMessage(&Message);       //WM_KEYDOWN이고 키가 문자 키일 때 WM_CHAR 발생
 		DispatchMessage(&Message);        //콜백 프로시저가 수행할 수 있게 디스패치 시킴
 
+		WinTimeCounter->Frame();
+
 		WinRasterizer->DrawTriangleList();
+		
+		TCHAR TitleString[100];
+		_stprintf_s(TitleString, 100, TEXT("%s  //  FPS: %.2f / DeltaTime: %.2fms"), szWndAppName, WinTimeCounter->GetFPS(), WinTimeCounter->GetDeltaTime());
+		SetWindowText(hWnd, TitleString);
 	}
 
 	// 6. 객체 해제.
@@ -84,11 +97,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		WinGDIManager->Release(hWnd);
 		delete WinGDIManager;
 	}
-
 	if (WinRasterizer != nullptr)
 	{
 		WinRasterizer->Release();
 		delete WinRasterizer;
+	}
+	if (WinTimeCounter != nullptr)
+	{
+		delete WinTimeCounter;
 	}
 
 	return 0;
