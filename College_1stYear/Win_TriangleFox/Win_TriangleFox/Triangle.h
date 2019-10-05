@@ -21,6 +21,8 @@ struct Triangle
 public:
 
 	void Initialize();
+
+	// 삼각형 내부포인트의 버텍스 별 가중치를 계산.
 	Vector3 GetVertexWeight(const Vector2& InPoint);
 
 private:

@@ -16,7 +16,7 @@ void Rasterizer::Initialize(GDIManager* InGDIManager)
 {
 	WinGDIManager = InGDIManager;
 
-	TriangleListCapacity = 24;
+	TriangleListCapacity = 27;
 }
 
 void Rasterizer::Release()
@@ -222,6 +222,30 @@ void Rasterizer::SetTriangleList()
 	TriangleList[23].Point2.VertexColor = TMath::ColorSet(255, 150, 128);
 	TriangleList[23].Point3.Position = TMath::Vector2Set(318.0f, 267.0f);
 	TriangleList[23].Point3.VertexColor = TMath::ColorSet(255, 170, 148);
+
+	// 25
+	TriangleList[24].Point1.Position = TMath::Vector2Set(374.0f, 259.0f);
+	TriangleList[24].Point1.VertexColor = TMath::ColorSet(234, 175, 145);
+	TriangleList[24].Point2.Position = TMath::Vector2Set(318.0f, 267.0f);
+	TriangleList[24].Point2.VertexColor = TMath::ColorSet(254, 195, 165);
+	TriangleList[24].Point3.Position = TMath::Vector2Set(398.0f, 324.0f);
+	TriangleList[24].Point3.VertexColor = TMath::ColorSet(255, 215, 185);
+
+	// 26
+	TriangleList[25].Point1.Position = TMath::Vector2Set(408.0f, 143.0f);
+	TriangleList[25].Point1.VertexColor = TMath::ColorSet(176, 0, 0);
+	TriangleList[25].Point2.Position = TMath::Vector2Set(452.0f, 158.0f);
+	TriangleList[25].Point2.VertexColor = TMath::ColorSet(196, 13, 7);
+	TriangleList[25].Point3.Position = TMath::Vector2Set(415.0f, 226.0f);
+	TriangleList[25].Point3.VertexColor = TMath::ColorSet(216, 33, 27);
+
+	// 27
+	TriangleList[26].Point1.Position = TMath::Vector2Set(415.0f, 226.0f);
+	TriangleList[26].Point1.VertexColor = TMath::ColorSet(226, 35, 6);
+	TriangleList[26].Point2.Position = TMath::Vector2Set(374.0f, 259.0f);
+	TriangleList[26].Point2.VertexColor = TMath::ColorSet(246, 55, 26);
+	TriangleList[26].Point3.Position = TMath::Vector2Set(398.0f, 324.0f);
+	TriangleList[26].Point3.VertexColor = TMath::ColorSet(255, 75, 46);
 	
 }
 
