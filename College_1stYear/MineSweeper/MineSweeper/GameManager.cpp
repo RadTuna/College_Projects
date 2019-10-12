@@ -57,7 +57,7 @@ void GameManager::UpdateGame()
 
 	// 현재 게임보드를 출력합니다.
 	DrawConsole();
-	std::cout << RecursiveCallCount << std::endl;
+	// std::cout << RecursiveCallCount << std::endl;
 
 	// 유저에게 입력을 받아 Map을 갱신합니다.
 	UserInput();
@@ -97,6 +97,12 @@ void GameManager::UserInput()
 	std::cout << "선택한 좌표 입력" << std::endl;
 
 	std::cin >> Row >> Colume;
+
+	if (Row == -22 && Colume == -55)
+	{
+		IsDebugMode = !IsDebugMode;
+		return;
+	}
 
 	if (GameMap->GetMaxRow() <= Row || GameMap->GetMaxColume() <= Colume)
 	{
