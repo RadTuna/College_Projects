@@ -44,9 +44,9 @@ bool List::Insert(int Index, const Point& InData)
 
 	for (int i = Lenght; i > Index; --i)
 	{
-		if (i >= Capacity - 1)
+		if (i >= Capacity)
 		{
-			continue;
+			break;
 		}
 
 		Array[i] = Array[i - 1];

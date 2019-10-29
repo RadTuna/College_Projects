@@ -8,14 +8,6 @@ Account::Account()
 {
 }
 
-Account::Account(int InAccNum, const char* InName, unsigned int InMoney)
-	: AccountNumber(InAccNum),
-	CurrentMoney(InMoney)
-{
-	Name = new char[strlen(InName) + 1];
-	strcpy_s(Name, strlen(InName) + 1, InName);
-}
-
 Account::~Account()
 {
 	if (Name != nullptr)
@@ -25,7 +17,7 @@ Account::~Account()
 	}
 }
 
-void Account::SetAccount(int InAccNum, const char* InName, unsigned int InMoney)
+void Account::SetAccount(int InAccNum, const char* InName, unsigned int InMoney, char CreditRating)
 {
 	if (Name != nullptr)
 	{
@@ -40,7 +32,9 @@ void Account::SetAccount(int InAccNum, const char* InName, unsigned int InMoney)
 	CurrentMoney = InMoney;
 }
 
-void Account::SetCurrentMoney(int InMoeny)
+unsigned int Account::WithDrawMoney(unsigned int InMoeny)
 {
-	CurrentMoney = InMoeny;
+	CurrentMoney -= InMoeny;
+	return CurrentMoney;
 }
+

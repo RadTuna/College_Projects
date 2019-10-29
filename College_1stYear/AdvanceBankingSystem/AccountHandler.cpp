@@ -1,29 +1,50 @@
 #include "AccountHandler.h"
 #include "Account.h"
+#include "HighCreditAccount.h"
+#include "NormalAccount.h"
 #include <iostream>
 
 AccountHandler::AccountHandler()
-	: DataSize(32)
+	: DataSize(32),
+	AccountData(nullptr)
 {
-	AccountData = new Account[DataSize];
+	AccountData = new Account*[DataSize];
+
+	for (int i = 0; i < DataSize; ++i)
+	{
+		AccountData[i] = nullptr;
+	}
 }
 
 AccountHandler::AccountHandler(int AccountReserve)
 	: DataSize(AccountReserve)
 {
-	AccountData = new Account[DataSize];
+	AccountData = new Account*[DataSize];
+
+	for (int i = 0; i < DataSize; ++i)
+	{
+		AccountData[i] = nullptr;
+	}
 }
 
 AccountHandler::~AccountHandler()
 {
 	if (AccountData != nullptr)
 	{
+		for (int i = 0; i < DataSize; ++i)
+		{
+			if (AccountData[i] != nullptr)
+			{
+				delete AccountData[i];
+				AccountData[i] = nullptr;
+			}
+		}
 		delete[] AccountData;
 		AccountData = nullptr;
 	}
 }
 
-bool AccountHandler::NewAccount(int AccountNumber, const char* InName, unsigned int InMoney)
+bool AccountHandler::NewNormalAccount(int AccountNumber, const char* InName, unsigned int InMoney)
 {
 	if (IsValidAccount(AccountNumber) == false)
 	{
@@ -34,7 +55,27 @@ bool AccountHandler::NewAccount(int AccountNumber, const char* InName, unsigned 
 		return false;
 	}
 
-	AccountData[AccountNumber].SetAccount(AccountNumber, InName, InMoney);
+	AccountData[AccountNumber] = new NormalAccount(3);
+
+	AccountData[AccountNumber]->SetAccount(AccountNumber, InName, InMoney, 'F');
+
+	return true;
+}
+
+bool AccountHandler::NewHighCreditAccount(int AccountNumber, const char* InName, unsigned int InMoney, char CreditRating)
+{
+	if (IsValidAccount(AccountNumber) == false)
+	{
+		return false;
+	}
+	if (IsEmptyAccount(AccountNumber) == false)
+	{
+		return false;
+	}
+
+	AccountData[AccountNumber] = new HighCreditAccount(3);
+	
+	AccountData[AccountNumber]->SetAccount(AccountNumber, InName, InMoney, CreditRating);
 
 	return true;
 }
@@ -50,9 +91,9 @@ bool AccountHandler::DespoitInAccount(int AccountNumber, unsigned int InMoney)
 		return false;
 	}
 
-	Account* CurAccount = &AccountData[AccountNumber];
+	Account* CurAccount = AccountData[AccountNumber];
 
-	CurAccount->SetCurrentMoney(CurAccount->GetCurrentMoney() + InMoney);
+	CurAccount->DepositMoney(InMoney);
 
 	return true;
 }
@@ -68,14 +109,14 @@ bool AccountHandler::WithdrawInAccount(int AccountNumber, unsigned int InMoney)
 		return false;
 	}
 
-	if (AccountData[AccountNumber].GetCurrentMoney() < InMoney)
+	if (AccountData[AccountNumber]->GetCurrentMoney() < InMoney)
 	{
 		return false;
 	}
 
-	Account* CurAccount = &AccountData[AccountNumber];
+	Account* CurAccount = AccountData[AccountNumber];
 
-	CurAccount->SetCurrentMoney(CurAccount->GetCurrentMoney() - InMoney);
+	CurAccount->WithDrawMoney(InMoney);
 
 	return true;
 }
@@ -91,7 +132,7 @@ const char* AccountHandler::GetAccountName(int AccountNumber) const
 		return nullptr;
 	}
 
-	return AccountData[AccountNumber].GetName();
+	return AccountData[AccountNumber]->GetName();
 }
 
 unsigned int AccountHandler::GetAccountMoney(int AccountNumber) const
@@ -105,7 +146,7 @@ unsigned int AccountHandler::GetAccountMoney(int AccountNumber) const
 		return 0;
 	}
 
-	return AccountData[AccountNumber].GetCurrentMoney();
+	return AccountData[AccountNumber]->GetCurrentMoney();
 }
 
 bool AccountHandler::GetAccountData(int AccountNumber, char*& OutName, unsigned int& OutMoney)
@@ -119,8 +160,8 @@ bool AccountHandler::GetAccountData(int AccountNumber, char*& OutName, unsigned 
 		return false;
 	}
 
-	OutName = const_cast<char*>(AccountData[AccountNumber].GetName());
-	OutMoney = AccountData[AccountNumber].GetCurrentMoney();
+	OutName = const_cast<char*>(AccountData[AccountNumber]->GetName());
+	OutMoney = AccountData[AccountNumber]->GetCurrentMoney();
 
 	return true;
 }
@@ -132,5 +173,10 @@ bool AccountHandler::IsValidAccount(int AccountNumber) const
 
 bool AccountHandler::IsEmptyAccount(int AccountNumber) const
 {
-	return AccountData[AccountNumber].GetAccountNumber() == -1;
+	if (AccountData[AccountNumber] == nullptr)
+	{
+		return true;
+	}
+
+	return false;
 }

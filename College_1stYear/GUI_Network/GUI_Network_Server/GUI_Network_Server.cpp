@@ -73,6 +73,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstatnce, LPSTR lpCmdLin
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+
+	// 임계영역 객체를 해제함.
 	DeleteCriticalSection(&cs);
 
 	return msg.wParam;
@@ -113,10 +115,15 @@ void DisplayText(char* fmt, ...)
 	char cbuf[BUFSIZE + 256];
 	vsprintf(cbuf, fmt, arg);
 
+	// 임계영역에 진입
+	// 다수의 클라이언트 메세지처리 스레드가 돌아가고, 따라서, 동시에 DisplayText를 호출할 수 있다.
+	// 따라서, 텍스트가 중간에 겹치지 않도록 임계영역을 설정해줌.
 	EnterCriticalSection(&cs);
 	int nLength = GetWindowTextLength(hEdit);
 	SendMessage(hEdit, EM_SETSEL, nLength, nLength);
 	SendMessage(hEdit, EM_REPLACESEL, false, (LPARAM)cbuf);
+
+	// 임계영역을 이탈.
 	LeaveCriticalSection(&cs);
 
 	va_end(arg);

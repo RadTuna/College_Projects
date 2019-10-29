@@ -1,6 +1,6 @@
 #pragma once
 
-class AccountHandler
+class AccountHandler final
 {
 public:
 
@@ -9,7 +9,8 @@ public:
 	AccountHandler(const AccountHandler& other) = delete;
 	~AccountHandler();
 
-	bool NewAccount(int AccountNumber, const char* InName, unsigned int InMoney);
+	bool NewNormalAccount(int AccountNumber, const char* InName, unsigned int InMoney);
+	bool NewHighCreditAccount(int AccountNumber, const char* InName, unsigned int InMoney, char CreditRating);
 	bool DespoitInAccount(int AccountNumber, unsigned int InMoney);
 	bool WithdrawInAccount(int AccountNumber, unsigned int InMoney);
 	const char* GetAccountName(int AccountNumber) const;
@@ -20,7 +21,7 @@ public:
 
 private:
 
-	class Account* AccountData;
+	class Account** AccountData;
 	int DataSize;
 
 public:

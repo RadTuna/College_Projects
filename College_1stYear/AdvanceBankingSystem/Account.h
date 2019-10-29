@@ -1,17 +1,19 @@
 #pragma once
 
+#include <string.h>
+
 class Account
 {
 public:
 
 	Account();
-	Account(int InAccNum, const char* InName, unsigned int InMoney);
-	~Account();
+	virtual  ~Account();
 
-	void SetAccount(int InAccNum, const char* InName, unsigned int InMoney);
-	void SetCurrentMoney(int InMoeny);
+	virtual void SetAccount(int InAccNum, const char* InName, unsigned int InMoney, char CreditRating);
+	virtual unsigned int DepositMoney(unsigned int InMoney) = 0;
+	unsigned int WithDrawMoney(unsigned int InMoeny);
 
-private:
+protected:
 
 	int AccountNumber;
 	char* Name;
