@@ -3,7 +3,7 @@
 
 int main()
 {
-	GameManager Manager(10, 10, 500, 4000, 5, 5);
+	GameManager Manager(10, 10, 1000, 300, 5, 9);
 
 	Manager.Awake();
 

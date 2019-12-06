@@ -6,10 +6,6 @@ Timer::Timer()
 {
 }
 
-Timer::~Timer()
-{
-}
-
 void Timer::SetTimer(long MilliSec, void* InClassPtr ,void(*pFunc)(void*))
 {
 	IntervalSec = MilliSec;

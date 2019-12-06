@@ -7,8 +7,8 @@ class Timer
 {
 public:
 
-	Timer();
-	~Timer();
+	explicit Timer();
+	~Timer() = default;
 
 	void SetTimer(long MilliSec, void* InClassPtr, void(*pFunc)(void*));
 	void ClearTimer();
