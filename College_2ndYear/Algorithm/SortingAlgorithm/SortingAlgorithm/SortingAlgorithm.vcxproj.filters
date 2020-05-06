@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Base">
+      <UniqueIdentifier>{b6cdbf65-5e85-42b8-ae66-8fa7ddbe979e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Selection">
+      <UniqueIdentifier>{e2d337f0-6c19-477b-b94c-a7ffb52d9f5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Insertion">
+      <UniqueIdentifier>{54cec47c-aea9-470a-bd80-352a13db8497}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bubble">
+      <UniqueIdentifier>{aa626700-748f-431b-80b2-097b0b0e8384}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SelectionSort.h">
+      <Filter>Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseSort.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="RandArrayGenerator.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="DoubleSelectionSort.h">
+      <Filter>Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="BubbleSort.h">
+      <Filter>Bubble</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+</Project>
