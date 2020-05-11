@@ -25,6 +25,7 @@ struct Vertex
 struct ObjectConstants
 {
     XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
+    float Time;
 };
 
 class BoxApp : public D3DApp
@@ -50,7 +51,7 @@ private:
 	void BuildConstantBuffers();
     void BuildRootSignature();
     void BuildShadersAndInputLayout();
-    void BuildBoxGeometry();
+    void BuildGeometry();
     void BuildPSO();
 
 private:
@@ -60,7 +61,7 @@ private:
 
     std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;
 
-	std::unique_ptr<MeshGeometry> mBoxGeo = nullptr;
+	std::unique_ptr<MeshGeometry> mCommonGeo = nullptr;
 
     ComPtr<ID3DBlob> mvsByteCode = nullptr;
     ComPtr<ID3DBlob> mpsByteCode = nullptr;
@@ -80,7 +81,7 @@ private:
     POINT mLastMousePos;
 };
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
+int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
 {
 	// Enable run-time memory check for debug builds.
@@ -124,7 +125,7 @@ bool BoxApp::Initialize()
 	BuildConstantBuffers();
     BuildRootSignature();
     BuildShadersAndInputLayout();
-    BuildBoxGeometry();
+    BuildGeometry();
     BuildPSO();
 
     // Execute the initialization commands.
@@ -155,7 +156,7 @@ void BoxApp::Update(const GameTimer& gt)
     float y = mRadius*cosf(mPhi);
 
     // Build the view matrix.
-    XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
+    XMVECTOR pos = XMVectorSet(x * 2.0f, y * 2.0f, z * 2.0f, 1.0f);
     XMVECTOR target = XMVectorZero();
     XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
@@ -169,6 +170,9 @@ void BoxApp::Update(const GameTimer& gt)
 	// Update the constant buffer with the latest worldViewProj matrix.
 	ObjectConstants objConstants;
     XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
+
+    objConstants.Time = gt.TotalTime();
+	
     mObjectCB->CopyData(0, objConstants);
 }
 
@@ -201,15 +205,24 @@ void BoxApp::Draw(const GameTimer& gt)
 
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
-	mCommandList->IASetVertexBuffers(0, 1, &mBoxGeo->VertexBufferView());
-	mCommandList->IASetIndexBuffer(&mBoxGeo->IndexBufferView());
+	mCommandList->IASetVertexBuffers(0, 1, &mCommonGeo->VertexBufferView());
+	mCommandList->IASetIndexBuffer(&mCommonGeo->IndexBufferView());
     mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     
     mCommandList->SetGraphicsRootDescriptorTable(0, mCbvHeap->GetGPUDescriptorHandleForHeapStart());
 
-    mCommandList->DrawIndexedInstanced(
-		mBoxGeo->DrawArgs["box"].IndexCount, 
-		1, 0, 0, 0);
+    const std::string renderGeometry = "Pyramid";
+    const UINT indexCount = mCommonGeo->DrawArgs[renderGeometry].IndexCount;
+    const UINT startIndexLocation = mCommonGeo->DrawArgs[renderGeometry].StartIndexLocation;
+    const UINT baseVertexLocation = mCommonGeo->DrawArgs[renderGeometry].BaseVertexLocation;
+
+    const std::string subRenderGeometry = "Plane";
+    const UINT subIndexCount = mCommonGeo->DrawArgs[subRenderGeometry].IndexCount;
+    const UINT subStartIndexLocation = mCommonGeo->DrawArgs[subRenderGeometry].StartIndexLocation;
+    const UINT subBaseVertexLocation = mCommonGeo->DrawArgs[subRenderGeometry].BaseVertexLocation;
+	
+    mCommandList->DrawIndexedInstanced( indexCount, 1, startIndexLocation, baseVertexLocation, 0);
+    mCommandList->DrawIndexedInstanced(subIndexCount, 1, subStartIndexLocation, subBaseVertexLocation, 0);
 	
     // Indicate a state transition on the resource usage.
 	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
@@ -361,10 +374,11 @@ void BoxApp::BuildShadersAndInputLayout()
     };
 }
 
-void BoxApp::BuildBoxGeometry()
+void BoxApp::BuildGeometry()
 {
-    std::array<Vertex, 8> vertices =
+    std::array<Vertex, 20> vertices =
     {
+    	// box
         Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
 		Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) }),
 		Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) }),
@@ -372,65 +386,125 @@ void BoxApp::BuildBoxGeometry()
 		Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue) }),
 		Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) }),
 		Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) })
-    };
+		Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) }),
 
-	std::array<std::uint16_t, 36> indices =
+    	// triangle
+        Vertex({ XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }),
+        Vertex({ XMFLOAT3(1.0f, -1.0f, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }),
+        Vertex({ XMFLOAT3(-1.0f, -1.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }),
+
+    	// pyramid
+        Vertex({ XMFLOAT3(0.0f, 4.0f, 0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }),
+        Vertex({ XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }),
+        Vertex({ XMFLOAT3(1.0f, 0.0f, -1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }),
+        Vertex({ XMFLOAT3(1.0f, 0.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }),
+        Vertex({ XMFLOAT3(-1.0f, 0.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }),
+
+    	// plane
+        Vertex({ XMFLOAT3(-5.0f, 0.0f, 5.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }),
+        Vertex({ XMFLOAT3(5.0f, 0.0f, 5.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }),
+        Vertex({ XMFLOAT3(5.0f, 0.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }),
+        Vertex({ XMFLOAT3(-5.0f, 0.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) })
+    };
+    const UINT totalVertexByteSize = static_cast<UINT>(vertices.size()) * sizeof(Vertex);
+
+    const UINT boxVertexNum = 8;
+    const UINT boxVertexOffset = 0;
+    const UINT triangleVertexNum = 3;
+    const UINT triangleVertexOffset = boxVertexNum;
+    const UINT pyramidVertexNum = 5;
+    const UINT pyramidVertexOffset = triangleVertexOffset + triangleVertexNum;
+    const UINT planeVertexNum = 4;
+    const UINT planeVertexOffset = pyramidVertexOffset + pyramidVertexNum;
+	
+    // box
+	std::array<std::uint16_t, 63> indices =
 	{
-		// front face
+		// box
 		0, 1, 2,
 		0, 2, 3,
-
-		// back face
 		4, 6, 5,
 		4, 7, 6,
-
-		// left face
 		4, 5, 1,
 		4, 1, 0,
-
-		// right face
 		3, 2, 6,
 		3, 6, 7,
-
-		// top face
 		1, 5, 6,
 		1, 6, 2,
-
-		// bottom face
 		4, 0, 3,
-		4, 3, 7
+		4, 3, 7,
+
+		// triangle
+        0, 1, 2,
+
+		// pyramid
+        0, 2, 1,
+        0, 3, 2,
+        0, 4, 3,
+        0, 1, 4,
+        1, 2, 3,
+        1, 3, 4,
+
+		// plane
+		0, 1, 2,
+		0, 2, 3
 	};
+    const UINT totalIndexByteSize = static_cast<UINT>(indices.size()) * sizeof(std::uint16_t);
+	
+    const UINT boxIndexNum = 36;
+    const UINT boxIndexOffset = 0;
+    const UINT triangleIndexNum = 3;
+    const UINT triangleIndexOffset = boxIndexNum;
+    const UINT pyramidIndexNum = 18;
+    const UINT pyramidIndexOffset = triangleIndexOffset + triangleIndexNum;
+    const UINT planeIndexNum = 6;
+    const UINT planeIndexOffset = pyramidIndexOffset + pyramidIndexNum;
 
-    const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
-	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
+	
+	mCommonGeo = std::make_unique<MeshGeometry>();
+	mCommonGeo->Name = "CommonGeo";
 
-	mBoxGeo = std::make_unique<MeshGeometry>();
-	mBoxGeo->Name = "boxGeo";
+	ThrowIfFailed(D3DCreateBlob(totalVertexByteSize, &mCommonGeo->VertexBufferCPU));
+	CopyMemory(mCommonGeo->VertexBufferCPU->GetBufferPointer(), vertices.data(), totalVertexByteSize);
 
-	ThrowIfFailed(D3DCreateBlob(vbByteSize, &mBoxGeo->VertexBufferCPU));
-	CopyMemory(mBoxGeo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
+	ThrowIfFailed(D3DCreateBlob(totalIndexByteSize, &mCommonGeo->IndexBufferCPU));
+	CopyMemory(mCommonGeo->IndexBufferCPU->GetBufferPointer(), indices.data(), totalIndexByteSize);
 
-	ThrowIfFailed(D3DCreateBlob(ibByteSize, &mBoxGeo->IndexBufferCPU));
-	CopyMemory(mBoxGeo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
+	mCommonGeo->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
+		mCommandList.Get(), vertices.data(), totalVertexByteSize, mCommonGeo->VertexBufferUploader);
 
-	mBoxGeo->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
-		mCommandList.Get(), vertices.data(), vbByteSize, mBoxGeo->VertexBufferUploader);
+	mCommonGeo->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
+		mCommandList.Get(), indices.data(), totalIndexByteSize, mCommonGeo->IndexBufferUploader);
 
-	mBoxGeo->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
-		mCommandList.Get(), indices.data(), ibByteSize, mBoxGeo->IndexBufferUploader);
+	mCommonGeo->VertexByteStride = sizeof(Vertex);
+	mCommonGeo->VertexBufferByteSize = totalVertexByteSize;
+	mCommonGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
+	mCommonGeo->IndexBufferByteSize = totalIndexByteSize;
 
-	mBoxGeo->VertexByteStride = sizeof(Vertex);
-	mBoxGeo->VertexBufferByteSize = vbByteSize;
-	mBoxGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
-	mBoxGeo->IndexBufferByteSize = ibByteSize;
+	SubmeshGeometry boxSubmesh;
+	boxSubmesh.IndexCount = boxIndexNum;
+	boxSubmesh.StartIndexLocation = boxIndexOffset;
+	boxSubmesh.BaseVertexLocation = boxIndexOffset;
 
-	SubmeshGeometry submesh;
-	submesh.IndexCount = (UINT)indices.size();
-	submesh.StartIndexLocation = 0;
-	submesh.BaseVertexLocation = 0;
+    SubmeshGeometry triangleSubmesh;
+    triangleSubmesh.IndexCount = triangleIndexNum;
+    triangleSubmesh.StartIndexLocation = triangleIndexOffset;
+    triangleSubmesh.BaseVertexLocation = triangleVertexOffset;
 
-	mBoxGeo->DrawArgs["box"] = submesh;
+    SubmeshGeometry pyramidSubmesh;
+    pyramidSubmesh.IndexCount = pyramidIndexNum;
+    pyramidSubmesh.StartIndexLocation = pyramidIndexOffset;
+    pyramidSubmesh.BaseVertexLocation = pyramidVertexOffset;
+
+    SubmeshGeometry planeSubmesh;
+    planeSubmesh.IndexCount = planeIndexNum;
+    planeSubmesh.StartIndexLocation = planeIndexOffset;
+    planeSubmesh.BaseVertexLocation = planeVertexOffset;
+
+	mCommonGeo->DrawArgs["Box"] = boxSubmesh;
+    mCommonGeo->DrawArgs["Triangle"] = triangleSubmesh;
+    mCommonGeo->DrawArgs["Pyramid"] = pyramidSubmesh;
+    mCommonGeo->DrawArgs["Plane"] = planeSubmesh;
 }
 
 void BoxApp::BuildPSO()
