@@ -13,6 +13,12 @@
     <Filter Include="Bubble">
       <UniqueIdentifier>{aa626700-748f-431b-80b2-097b0b0e8384}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Merge">
+      <UniqueIdentifier>{13792aa4-f30a-4f3c-a3ee-efc6e06aaf59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quick">
+      <UniqueIdentifier>{1605d6ef-85ed-43f4-b8b1-fb0e328f3691}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SelectionSort.h">
@@ -30,8 +36,43 @@
     <ClInclude Include="BubbleSort.h">
       <Filter>Bubble</Filter>
     </ClInclude>
+    <ClInclude Include="InsertionSort.h">
+      <Filter>Insertion</Filter>
+    </ClInclude>
+    <ClInclude Include="MergeSort.h">
+      <Filter>Merge</Filter>
+    </ClInclude>
+    <ClInclude Include="QuickSort.h">
+      <Filter>Quick</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeCounter.h">
+      <Filter>Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="BaseSort.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="BubbleSort.cpp">
+      <Filter>Bubble</Filter>
+    </ClCompile>
+    <ClCompile Include="InsertionSort.cpp">
+      <Filter>Insertion</Filter>
+    </ClCompile>
+    <ClCompile Include="MergeSort.cpp">
+      <Filter>Merge</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectionSort.cpp">
+      <Filter>Selection</Filter>
+    </ClCompile>
+    <ClCompile Include="DoubleSelectionSort.cpp">
+      <Filter>Selection</Filter>
+    </ClCompile>
+    <ClCompile Include="QuickSort.cpp">
+      <Filter>Quick</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeCounter.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -4,6 +4,9 @@
 
 #include "GeometryGenerator.h"
 #include <algorithm>
+#include <fstream>
+#include <string>
+#include <sstream>
 
 using namespace DirectX;
 
@@ -654,4 +657,169 @@ GeometryGenerator::MeshData GeometryGenerator::CreateQuad(float x, float y, floa
 	meshData.Indices32[5] = 3;
 
     return meshData;
+}
+
+GeometryGenerator::MeshData GeometryGenerator::CreatePyramid(float x, float z, float h)
+{
+	MeshData meshData;
+
+	meshData.Vertices.resize(5);
+	meshData.Indices32.resize(18);
+
+	const float halfX = x * 0.5f;
+	const float halfZ = z * 0.5f;
+
+	meshData.Vertices[0] = Vertex(
+		0.0f, h, 0.0f, 
+		0.0f, 0.0f, 0.0f, 
+		0.0f, 0.0f, 0.0f, 
+		0.0f, 0.0f);
+	meshData.Vertices[1] = Vertex(
+		-halfX, 0.0f, -halfZ, 
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 
+		0.0f, 0.0f);
+	meshData.Vertices[2] = Vertex(
+		halfX, 0.0f, -halfZ, 
+		0.0f, 0.0f, 0.0f, 
+		0.0f, 0.0f, 0.0f, 
+		0.0f, 0.0f);
+	meshData.Vertices[3] = Vertex(
+		halfX, 0.0f, halfZ, 
+		0.0f, 0.0f, 0.0f, 
+		0.0f, 0.0f, 0.0f, 
+		0.0f, 0.0f);
+	meshData.Vertices[4] = Vertex(
+		-halfX, 0.0f, halfZ, 
+		0.0f, 0.0f, 0.0f, 
+		0.0f, 0.0f, 0.0f, 
+		0.0f, 0.0f);
+
+	meshData.Indices32[0] = 0;
+	meshData.Indices32[1] = 2;
+	meshData.Indices32[2] = 1;
+	
+	meshData.Indices32[3] = 0;
+	meshData.Indices32[4] = 3;
+	meshData.Indices32[5] = 2;
+	
+	meshData.Indices32[6] = 0;
+	meshData.Indices32[7] = 4;
+	meshData.Indices32[8] = 3;
+	
+	meshData.Indices32[9] = 0;
+	meshData.Indices32[10] = 1;
+	meshData.Indices32[11] = 4;
+	
+	meshData.Indices32[12] = 1;
+	meshData.Indices32[13] = 2;
+	meshData.Indices32[14] = 3;
+	
+	meshData.Indices32[15] = 1;
+	meshData.Indices32[16] = 3;
+	meshData.Indices32[17] = 4;
+
+	return meshData;
+}
+
+GeometryGenerator::MeshData GeometryGenerator::CreateSkull()
+{
+	std::ifstream readTxt;
+	readTxt.open("../Graphics_Shape/skull.txt");
+
+	if (!readTxt.is_open())
+	{
+		throw std::exception("do not read skull.txt");
+	}
+
+	unsigned int vertexCount = 0;
+	unsigned int indexCount = 0;
+
+	MeshData meshData;
+
+	unsigned int currentVertexCount = 0;
+	unsigned int currentIndexCount = 0;
+	for (;!readTxt.eof();)
+	{
+		std::string curString;
+		std::getline(readTxt, curString, '\n');
+		if (curString == "VertexCount")
+		{
+			std::getline(readTxt, curString, '\n');
+			vertexCount = std::stoul(curString);
+			meshData.Vertices.resize(vertexCount);
+		}
+
+		if (curString == "TriangleCount")
+		{
+			std::getline(readTxt, curString);
+			indexCount = std::stoul(curString);
+			meshData.Indices32.resize(indexCount * 3);
+		}
+
+		if (curString == "VertexList")
+		{
+			std::getline(readTxt, curString, '\n'); // delete '{'
+			
+			for (;curString != "}"; ++currentVertexCount)
+			{
+				std::getline(readTxt, curString, '\n');
+				std::stringstream vertexSs(curString);
+
+				if (curString == "}")
+				{
+					break;
+				}
+
+				std::string vertexElement;
+				std::getline(vertexSs, vertexElement, ' ');
+				meshData.Vertices[currentVertexCount].Position.x = std::stof(vertexElement);
+
+				std::getline(vertexSs, vertexElement, ' ');
+				meshData.Vertices[currentVertexCount].Position.y = std::stof(vertexElement);
+
+				std::getline(vertexSs, vertexElement, ' ');
+				meshData.Vertices[currentVertexCount].Position.z = std::stof(vertexElement);
+
+				std::getline(vertexSs, vertexElement, ' ');
+				meshData.Vertices[currentVertexCount].Normal.x = std::stof(vertexElement);
+
+				std::getline(vertexSs, vertexElement, ' ');
+				meshData.Vertices[currentVertexCount].Normal.y = std::stof(vertexElement);
+
+				std::getline(vertexSs, vertexElement, ' ');
+				meshData.Vertices[currentVertexCount].Normal.z = std::stof(vertexElement);
+			}
+		}
+
+		if (curString == "TriangleList")
+		{
+			std::getline(readTxt, curString, '\n'); // delete '{'
+			
+			for (;curString != "}"; currentIndexCount += 3)
+			{
+				std::getline(readTxt, curString, '\n');
+				std::stringstream vertexSs(curString);
+
+				if (curString == "}")
+				{
+					break;
+				}
+				
+				std::string IndexElement;
+				std::getline(vertexSs, IndexElement, ' ');
+				meshData.Indices32[currentIndexCount + 0] = std::stof(IndexElement);
+
+				std::getline(vertexSs, IndexElement, ' ');
+				meshData.Indices32[currentIndexCount + 1] = std::stof(IndexElement);
+
+				std::getline(vertexSs, IndexElement, ' ');
+				meshData.Indices32[currentIndexCount + 2] = std::stof(IndexElement);
+			}
+		}
+	}
+	
+	readTxt.close();
+
+	return meshData;
 }
