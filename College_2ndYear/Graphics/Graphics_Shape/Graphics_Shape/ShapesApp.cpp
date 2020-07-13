@@ -24,10 +24,12 @@ struct RenderItem
 {
 	RenderItem() = default;
 
-    // World matrix of the shape that describes the object's local space
-    // relative to the world space, which defines the position, orientation,
-    // and scale of the object in the world.
-    XMFLOAT4X4 World = MathHelper::Identity4x4();
+	// World matrix of the shape that describes the object's local space
+	// relative to the world space, which defines the position, orientation,
+	// and scale of the object in the world.
+	XMFLOAT4X4 World = MathHelper::Identity4x4();
+
+	XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
 
 	// Dirty flag indicating the object data has changed and we need to update the constant buffer.
 	// Because we have an object cbuffer for each FrameResource, we have to apply the
@@ -38,67 +40,74 @@ struct RenderItem
 	// Index into GPU constant buffer corresponding to the ObjectCB for this render item.
 	UINT ObjCBIndex = -1;
 
+	Material* Mat = nullptr;
 	MeshGeometry* Geo = nullptr;
 
-    // Primitive topology.
-    D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	// Primitive topology.
+	D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-    // DrawIndexedInstanced parameters.
-    UINT IndexCount = 0;
-    UINT StartIndexLocation = 0;
-    int BaseVertexLocation = 0;
+	// DrawIndexedInstanced parameters.
+	UINT IndexCount = 0;
+	UINT StartIndexLocation = 0;
+	int BaseVertexLocation = 0;
 };
 
 class ShapesApp : public D3DApp
 {
 public:
-    ShapesApp(HINSTANCE hInstance);
-    ShapesApp(const ShapesApp& rhs) = delete;
-    ShapesApp& operator=(const ShapesApp& rhs) = delete;
-    ~ShapesApp();
+	ShapesApp(HINSTANCE hInstance);
+	ShapesApp(const ShapesApp& rhs) = delete;
+	ShapesApp& operator=(const ShapesApp& rhs) = delete;
+	~ShapesApp();
 
-    virtual bool Initialize()override;
+	virtual bool Initialize()override;
 
 private:
-    virtual void OnResize()override;
-    virtual void Update(const GameTimer& gt)override;
-    virtual void Draw(const GameTimer& gt)override;
+	virtual void OnResize()override;
+	virtual void Update(const GameTimer& gt)override;
+	virtual void Draw(const GameTimer& gt)override;
 
-    virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
-    virtual void OnMouseUp(WPARAM btnState, int x, int y)override;
-    virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
+	virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
+	virtual void OnMouseUp(WPARAM btnState, int x, int y)override;
+	virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
 
-    void OnKeyboardInput(const GameTimer& gt);
+	void OnKeyboardInput(const GameTimer& gt);
 	void UpdateCamera(const GameTimer& gt);
 	void UpdateObjectCBs(const GameTimer& gt);
+	void UpdateMaterialCBs(const GameTimer& gt);
 	void UpdateMainPassCB(const GameTimer& gt);
 
-    void BuildDescriptorHeaps();
-    void BuildConstantBufferViews();
-    void BuildRootSignature();
-    void BuildShadersAndInputLayout();
-    void BuildShapeGeometry();
-    void BuildPSOs();
-    void BuildFrameResources();
-    void BuildRenderItems();
-    void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems);
- 
+	void LoadTexture();
+	void BuildDescriptorHeaps();
+	void BuildRootSignature();
+	void BuildShadersAndInputLayout();
+	void BuildShapeGeometry();
+	void BuildMaterial();
+	void BuildPSOs();
+	void BuildFrameResources();
+	void BuildRenderItems();
+	void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems);
+
+	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers();
+
 private:
 
-    std::vector<std::unique_ptr<FrameResource>> mFrameResources;
-    FrameResource* mCurrFrameResource = nullptr;
-    int mCurrFrameResourceIndex = 0;
+	std::vector<std::unique_ptr<FrameResource>> mFrameResources;
+	FrameResource* mCurrFrameResource = nullptr;
+	int mCurrFrameResourceIndex = 0;
 
-    ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
-    ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
+	ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
 
 	ComPtr<ID3D12DescriptorHeap> mSrvDescriptorHeap = nullptr;
 
+	UINT mCbvSrvDescriptorSize;
+
 	std::unordered_map<std::string, std::unique_ptr<MeshGeometry>> mGeometries;
 	std::unordered_map<std::string, ComPtr<ID3DBlob>> mShaders;
-    std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> mPSOs;
+	std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> mPSOs;
+	std::unordered_map<std::string, std::unique_ptr<Material>> mMaterials;
 
-    std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
+	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
 
 	// List of all the render items.
 	std::vector<std::unique_ptr<RenderItem>> mAllRitems;
@@ -106,245 +115,282 @@ private:
 	// Render items divided by PSO.
 	std::vector<RenderItem*> mOpaqueRitems;
 
-    PassConstants mMainPassCB;
+	std::vector<XMFLOAT3> mPointLightLocation;
 
-    UINT mPassCbvOffset = 0;
+	PassConstants mMainPassCB;
 
-    bool mIsWireframe = false;
+	UINT mPassCbvOffset = 0;
+
+	bool mIsWireframe = false;
 
 	XMFLOAT3 mEyePos = { 0.0f, 0.0f, 0.0f };
 	XMFLOAT4X4 mView = MathHelper::Identity4x4();
 	XMFLOAT4X4 mProj = MathHelper::Identity4x4();
 
-    float mTheta = 1.5f*XM_PI;
-    float mPhi = 0.2f*XM_PI;
-    float mRadius = 15.0f;
+	float mTheta = 1.5f * XM_PI;
+	float mPhi = 0.2f * XM_PI;
+	float mRadius = 15.0f;
 
-    POINT mLastMousePos;
+	POINT mLastMousePos;
+
+	float mSunTheta;
+	float mSunPhi;
+
+	std::unordered_map<std::string, std::unique_ptr<Texture>> mTextures;
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
-    PSTR cmdLine, int showCmd)
+	PSTR cmdLine, int showCmd)
 {
-    // Enable run-time memory check for debug builds.
+	// Enable run-time memory check for debug builds.
 #if defined(DEBUG) | defined(_DEBUG)
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-    try
-    {
-        ShapesApp theApp(hInstance);
-        if(!theApp.Initialize())
-            return 0;
+	try
+	{
+		ShapesApp theApp(hInstance);
+		if (!theApp.Initialize())
+			return 0;
 
-        return theApp.Run();
-    }
-    catch(DxException& e)
-    {
-        MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
-        return 0;
-    }
+		return theApp.Run();
+	}
+	catch (DxException& e)
+	{
+		MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
+		return 0;
+	}
 }
 
 ShapesApp::ShapesApp(HINSTANCE hInstance)
-    : D3DApp(hInstance)
+	: D3DApp(hInstance)
 {
 }
 
 ShapesApp::~ShapesApp()
 {
-    if(md3dDevice != nullptr)
-        FlushCommandQueue();
+	if (md3dDevice != nullptr)
+		FlushCommandQueue();
 }
 
 bool ShapesApp::Initialize()
 {
-    if(!D3DApp::Initialize())
-        return false;
+	if (!D3DApp::Initialize())
+		return false;
 
-    // Reset the command list to prep for initialization commands.
-    ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
+	// Reset the command list to prep for initialization commands.
+	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
-    BuildRootSignature();
-    BuildShadersAndInputLayout();
-    BuildShapeGeometry();
-    BuildRenderItems();
-    BuildFrameResources();
-    BuildDescriptorHeaps();
-    BuildConstantBufferViews();
-    BuildPSOs();
+	mCbvSrvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-    // Execute the initialization commands.
-    ThrowIfFailed(mCommandList->Close());
-    ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
-    mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+	LoadTexture();
+	BuildRootSignature();
+	BuildShadersAndInputLayout();
+	BuildMaterial();
+	BuildShapeGeometry();
+	BuildRenderItems();
+	BuildFrameResources();
+	BuildDescriptorHeaps();
+	BuildPSOs();
 
-    // Wait until initialization is complete.
-    FlushCommandQueue();
+	// Execute the initialization commands.
+	ThrowIfFailed(mCommandList->Close());
+	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
+	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-    return true;
+	// Wait until initialization is complete.
+	FlushCommandQueue();
+
+	return true;
 }
- 
+
 void ShapesApp::OnResize()
 {
-    D3DApp::OnResize();
+	D3DApp::OnResize();
 
-    // The window resized, so update the aspect ratio and recompute the projection matrix.
-    XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
-    XMStoreFloat4x4(&mProj, P);
+	// The window resized, so update the aspect ratio and recompute the projection matrix.
+	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
+	XMStoreFloat4x4(&mProj, P);
 }
 
 void ShapesApp::Update(const GameTimer& gt)
 {
-    OnKeyboardInput(gt);
+	OnKeyboardInput(gt);
 	UpdateCamera(gt);
 
-    // Cycle through the circular frame resource array.
-    mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % gNumFrameResources;
-    mCurrFrameResource = mFrameResources[mCurrFrameResourceIndex].get();
+	// Cycle through the circular frame resource array.
+	mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % gNumFrameResources;
+	mCurrFrameResource = mFrameResources[mCurrFrameResourceIndex].get();
 
-    // Has the GPU finished processing the commands of the current frame resource?
-    // If not, wait until the GPU has completed commands up to this fence point.
-    if(mCurrFrameResource->Fence != 0 && mFence->GetCompletedValue() < mCurrFrameResource->Fence)
-    {
-        HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
-        ThrowIfFailed(mFence->SetEventOnCompletion(mCurrFrameResource->Fence, eventHandle));
-        WaitForSingleObject(eventHandle, INFINITE);
-        CloseHandle(eventHandle);
-    }
+	// Has the GPU finished processing the commands of the current frame resource?
+	// If not, wait until the GPU has completed commands up to this fence point.
+	if (mCurrFrameResource->Fence != 0 && mFence->GetCompletedValue() < mCurrFrameResource->Fence)
+	{
+		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+		ThrowIfFailed(mFence->SetEventOnCompletion(mCurrFrameResource->Fence, eventHandle));
+		WaitForSingleObject(eventHandle, INFINITE);
+		CloseHandle(eventHandle);
+	}
 
 	UpdateObjectCBs(gt);
+	UpdateMaterialCBs(gt);
 	UpdateMainPassCB(gt);
 }
 
 void ShapesApp::Draw(const GameTimer& gt)
 {
-    auto cmdListAlloc = mCurrFrameResource->CmdListAlloc;
+	auto cmdListAlloc = mCurrFrameResource->CmdListAlloc;
 
-    // Reuse the memory associated with command recording.
-    // We can only reset when the associated command lists have finished execution on the GPU.
-    ThrowIfFailed(cmdListAlloc->Reset());
+	// Reuse the memory associated with command recording.
+	// We can only reset when the associated command lists have finished execution on the GPU.
+	ThrowIfFailed(cmdListAlloc->Reset());
 
-    // A command list can be reset after it has been added to the command queue via ExecuteCommandList.
-    // Reusing the command list reuses memory.
-    if(mIsWireframe)
-    {
-        ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque_wireframe"].Get()));
-    }
-    else
-    {
-        ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque"].Get()));
-    }
+	// A command list can be reset after it has been added to the command queue via ExecuteCommandList.
+	// Reusing the command list reuses memory.
+	if (mIsWireframe)
+	{
+		ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque_wireframe"].Get()));
+	}
+	else
+	{
+		ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque"].Get()));
+	}
 
-    mCommandList->RSSetViewports(1, &mScreenViewport);
-    mCommandList->RSSetScissorRects(1, &mScissorRect);
+	mCommandList->RSSetViewports(1, &mScreenViewport);
+	mCommandList->RSSetScissorRects(1, &mScissorRect);
 
-    // Indicate a state transition on the resource usage.
+	// Indicate a state transition on the resource usage.
 	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
-    // Clear the back buffer and depth buffer.
-    mCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightSteelBlue, 0, nullptr);
-    mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+	// Clear the back buffer and depth buffer.
+	mCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightSteelBlue, 0, nullptr);
+	mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
-    // Specify the buffers we are going to render to.
-    mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+	// Specify the buffers we are going to render to.
+	mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
 
-    ID3D12DescriptorHeap* descriptorHeaps[] = { mCbvHeap.Get() };
-    mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+	ID3D12DescriptorHeap* descriptorHeaps[] = { mSrvDescriptorHeap.Get() };
+	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
-    int passCbvIndex = mPassCbvOffset + mCurrFrameResourceIndex;
-    auto passCbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(mCbvHeap->GetGPUDescriptorHandleForHeapStart());
-    passCbvHandle.Offset(passCbvIndex, mCbvSrvUavDescriptorSize);
-    mCommandList->SetGraphicsRootDescriptorTable(1, passCbvHandle);
+	auto passCB = mCurrFrameResource->PassCB->Resource();
+	mCommandList->SetGraphicsRootConstantBufferView(3, passCB->GetGPUVirtualAddress());
 
-    DrawRenderItems(mCommandList.Get(), mOpaqueRitems);
+	DrawRenderItems(mCommandList.Get(), mOpaqueRitems);
 
-    // Indicate a state transition on the resource usage.
+	// Indicate a state transition on the resource usage.
 	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
-    // Done recording commands.
-    ThrowIfFailed(mCommandList->Close());
+	// Done recording commands.
+	ThrowIfFailed(mCommandList->Close());
 
-    // Add the command list to the queue for execution.
-    ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
-    mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+	// Add the command list to the queue for execution.
+	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
+	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-    // Swap the back and front buffers
-    ThrowIfFailed(mSwapChain->Present(0, 0));
+	// Swap the back and front buffers
+	ThrowIfFailed(mSwapChain->Present(0, 0));
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 
-    // Advance the fence value to mark commands up to this fence point.
-    mCurrFrameResource->Fence = ++mCurrentFence;
-    
-    // Add an instruction to the command queue to set a new fence point. 
-    // Because we are on the GPU timeline, the new fence point won't be 
-    // set until the GPU finishes processing all the commands prior to this Signal().
-    mCommandQueue->Signal(mFence.Get(), mCurrentFence);
+	// Advance the fence value to mark commands up to this fence point.
+	mCurrFrameResource->Fence = ++mCurrentFence;
+
+	// Add an instruction to the command queue to set a new fence point. 
+	// Because we are on the GPU timeline, the new fence point won't be 
+	// set until the GPU finishes processing all the commands prior to this Signal().
+	mCommandQueue->Signal(mFence.Get(), mCurrentFence);
 }
 
 void ShapesApp::OnMouseDown(WPARAM btnState, int x, int y)
 {
-    mLastMousePos.x = x;
-    mLastMousePos.y = y;
+	mLastMousePos.x = x;
+	mLastMousePos.y = y;
 
-    SetCapture(mhMainWnd);
+	SetCapture(mhMainWnd);
 }
 
 void ShapesApp::OnMouseUp(WPARAM btnState, int x, int y)
 {
-    ReleaseCapture();
+	ReleaseCapture();
 }
 
 void ShapesApp::OnMouseMove(WPARAM btnState, int x, int y)
 {
-    if((btnState & MK_LBUTTON) != 0)
-    {
-        // Make each pixel correspond to a quarter of a degree.
-        float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePos.x));
-        float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
+	if ((btnState & MK_LBUTTON) != 0)
+	{
+		// Make each pixel correspond to a quarter of a degree.
+		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
+		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
 
-        // Update angles based on input to orbit camera around box.
-        mTheta += dx;
-        mPhi += dy;
+		// Update angles based on input to orbit camera around box.
+		mTheta += dx;
+		mPhi += dy;
 
-        // Restrict the angle mPhi.
-        mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::Pi - 0.1f);
-    }
-    else if((btnState & MK_RBUTTON) != 0)
-    {
-        // Make each pixel correspond to 0.2 unit in the scene.
-        float dx = 0.05f*static_cast<float>(x - mLastMousePos.x);
-        float dy = 0.05f*static_cast<float>(y - mLastMousePos.y);
+		// Restrict the angle mPhi.
+		mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::Pi - 0.1f);
+	}
+	else if ((btnState & MK_RBUTTON) != 0)
+	{
+		// Make each pixel correspond to 0.2 unit in the scene.
+		float dx = 0.05f * static_cast<float>(x - mLastMousePos.x);
+		float dy = 0.05f * static_cast<float>(y - mLastMousePos.y);
 
-        // Update the camera radius based on input.
-        mRadius += dx - dy;
+		// Update the camera radius based on input.
+		mRadius += dx - dy;
 
-        // Restrict the radius.
-        mRadius = MathHelper::Clamp(mRadius, 5.0f, 150.0f);
-    }
+		// Restrict the radius.
+		mRadius = MathHelper::Clamp(mRadius, 5.0f, 150.0f);
+	}
 
-    mLastMousePos.x = x;
-    mLastMousePos.y = y;
+	mLastMousePos.x = x;
+	mLastMousePos.y = y;
 }
- 
+
 void ShapesApp::OnKeyboardInput(const GameTimer& gt)
 {
-    if(GetAsyncKeyState('1') & 0x8000)
-        mIsWireframe = true;
-    else
-        mIsWireframe = false;
+	const float dt = gt.DeltaTime();
+
+	if(GetAsyncKeyState(VK_LEFT) & 0x8000)
+	{
+		mSunTheta -= 1.0f*dt;
+	}
+
+	if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
+	{
+		mSunTheta += 1.0f*dt;
+	}
+
+	if(GetAsyncKeyState(VK_UP) & 0x8000)
+	{
+		mSunPhi -= 1.0f*dt;
+	}
+
+	if(GetAsyncKeyState(VK_DOWN) & 0x8000)
+	{
+		mSunPhi += 1.0f*dt;
+	}
+
+	mSunPhi = MathHelper::Clamp(mSunPhi, 0.1f, XM_PIDIV2);
+	
+	if (GetAsyncKeyState('1') & 0x8000)
+	{
+		mIsWireframe = true;
+	}
+	else
+	{
+		mIsWireframe = false;
+	}
 }
- 
+
 void ShapesApp::UpdateCamera(const GameTimer& gt)
 {
 	// Convert Spherical to Cartesian coordinates.
-	mEyePos.x = mRadius*sinf(mPhi)*cosf(mTheta);
-	mEyePos.z = mRadius*sinf(mPhi)*sinf(mTheta);
-	mEyePos.y = mRadius*cosf(mPhi);
+	mEyePos.x = mRadius * sinf(mPhi) * cosf(mTheta);
+	mEyePos.z = mRadius * sinf(mPhi) * sinf(mTheta);
+	mEyePos.y = mRadius * cosf(mPhi);
 
 	// Build the view matrix.
 	XMVECTOR pos = XMVectorSet(mEyePos.x, mEyePos.y, mEyePos.z, 1.0f);
@@ -358,21 +404,44 @@ void ShapesApp::UpdateCamera(const GameTimer& gt)
 void ShapesApp::UpdateObjectCBs(const GameTimer& gt)
 {
 	auto currObjectCB = mCurrFrameResource->ObjectCB.get();
-	for(auto& e : mAllRitems)
+	for (auto& e : mAllRitems)
 	{
 		// Only update the cbuffer data if the constants have changed.  
 		// This needs to be tracked per frame resource.
-		if(e->NumFramesDirty > 0)
+		if (e->NumFramesDirty > 0)
 		{
 			XMMATRIX world = XMLoadFloat4x4(&e->World);
+			XMMATRIX texTransform = XMLoadFloat4x4(&e->TexTransform);
 
 			ObjectConstants objConstants;
 			XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(world));
+			XMStoreFloat4x4(&objConstants.TexTransform, XMMatrixTranspose(texTransform));
 
 			currObjectCB->CopyData(e->ObjCBIndex, objConstants);
 
 			// Next FrameResource need to be updated too.
 			e->NumFramesDirty--;
+		}
+	}
+}
+
+void ShapesApp::UpdateMaterialCBs(const GameTimer& gt)
+{
+	auto currMatCB = mCurrFrameResource->MaterialCB.get();
+	for (auto& matPair : mMaterials)
+	{
+		Material* material = matPair.second.get();
+
+		if (material->NumFramesDirty > 0)
+		{
+			MaterialConstants materialConstant;
+			materialConstant.DiffuseAlbedo = material->DiffuseAlbedo;
+			materialConstant.FresnelR0 = material->FresnelR0;
+			materialConstant.Roughness = material->Roughness;
+
+			currMatCB->CopyData(material->MatCBIndex, materialConstant);
+			
+			material->NumFramesDirty--;
 		}
 	}
 }
@@ -400,100 +469,170 @@ void ShapesApp::UpdateMainPassCB(const GameTimer& gt)
 	mMainPassCB.FarZ = 1000.0f;
 	mMainPassCB.TotalTime = gt.TotalTime();
 	mMainPassCB.DeltaTime = gt.DeltaTime();
+	mMainPassCB.AmbientLight = { 0.2f, 0.2f, 0.2f, 1.0f };
+
+	// light
+
+	XMVECTOR lightDir = -MathHelper::SphericalToCartesian(1.0f, mSunTheta, mSunPhi);
+	XMStoreFloat3(&mMainPassCB.Lights[0].Direction, lightDir);
+	mMainPassCB.Lights[0].Strength = { 0.8f, 0.8f, 0.8f };
+
+	for (int i = 0, k = 1; i < mPointLightLocation.size(); ++i, ++k)
+	{
+		mMainPassCB.Lights[k].Position = mPointLightLocation[i];
+		mMainPassCB.Lights[k].FalloffStart = 1.0f;
+		mMainPassCB.Lights[k].FalloffEnd = 7.0f;
+		mMainPassCB.Lights[k].Strength = { 1.0f, 1.0f, 1.0f };
+	}
+	
+	// light
 
 	auto currPassCB = mCurrFrameResource->PassCB.get();
 	currPassCB->CopyData(0, mMainPassCB);
 }
 
-void ShapesApp::BuildDescriptorHeaps()
+void ShapesApp::LoadTexture()
 {
-    UINT objCount = (UINT)mOpaqueRitems.size();
+	auto woodCrateTex = std::make_unique<Texture>();
+	woodCrateTex->Name = "woodCrateTex";
+	woodCrateTex->Filename = L"../../Textures/WoodCrate01.dds";
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
+	mCommandList.Get(), woodCrateTex->Filename.c_str(),
+	woodCrateTex->Resource, woodCrateTex->UploadHeap));
+ 
+	mTextures[woodCrateTex->Name] = std::move(woodCrateTex);
 
-    // Need a CBV descriptor for each object for each frame resource,
-    // +1 for the perPass CBV for each frame resource.
-    UINT numDescriptors = (objCount+1) * gNumFrameResources;
+	auto wireFenceTex = std::make_unique<Texture>();
+	wireFenceTex->Name = "bricksTex";
+	wireFenceTex->Filename = L"../../Textures/bricks.dds";
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
+		mCommandList.Get(), wireFenceTex->Filename.c_str(),
+		wireFenceTex->Resource, wireFenceTex->UploadHeap));
+ 
+	mTextures[wireFenceTex->Name] = std::move(wireFenceTex);
 
-    // Save an offset to the start of the pass CBVs.  These are the last 3 descriptors.
-    mPassCbvOffset = objCount * gNumFrameResources;
+	auto tileTex = std::make_unique<Texture>();
+	tileTex->Name = "tileTex";
+	tileTex->Filename = L"../../Textures/Tile.dds";
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
+		mCommandList.Get(), tileTex->Filename.c_str(),
+		tileTex->Resource, tileTex->UploadHeap));
+ 
+	mTextures[tileTex->Name] = std::move(tileTex);
 
-    D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-    cbvHeapDesc.NumDescriptors = numDescriptors;
-    cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    cbvHeapDesc.NodeMask = 0;
-    ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc,
-        IID_PPV_ARGS(&mCbvHeap)));
+	auto grassTex = std::make_unique<Texture>();
+	grassTex->Name = "grassTex";
+	grassTex->Filename = L"../../Textures/grass.dds";
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
+		mCommandList.Get(), grassTex->Filename.c_str(),
+		grassTex->Resource, grassTex->UploadHeap));
+ 
+	mTextures[grassTex->Name] = std::move(grassTex);
+
+	auto stoneTex = std::make_unique<Texture>();
+	stoneTex->Name = "stoneTex";
+	stoneTex->Filename = L"../../Textures/stone.dds";
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
+		mCommandList.Get(), stoneTex->Filename.c_str(),
+		stoneTex->Resource, stoneTex->UploadHeap));
+ 
+	mTextures[stoneTex->Name] = std::move(stoneTex);
 }
 
-void ShapesApp::BuildConstantBufferViews()
-{
-    UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+void ShapesApp::BuildDescriptorHeaps()
+{	
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+	srvHeapDesc.NumDescriptors = 5;
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&mSrvDescriptorHeap)));
 
-    UINT objCount = (UINT)mOpaqueRitems.size();
+	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(mSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-    // Need a CBV descriptor for each object for each frame resource.
-    for(int frameIndex = 0; frameIndex < gNumFrameResources; ++frameIndex)
-    {
-        auto objectCB = mFrameResources[frameIndex]->ObjectCB->Resource();
-        for(UINT i = 0; i < objCount; ++i)
-        {
-            D3D12_GPU_VIRTUAL_ADDRESS cbAddress = objectCB->GetGPUVirtualAddress();
+	auto woodCrateTex = mTextures["woodCrateTex"]->Resource;
+	
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = woodCrateTex->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = woodCrateTex->GetDesc().MipLevels;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-            // Offset to the ith object constant buffer in the buffer.
-            cbAddress += i*objCBByteSize;
+	md3dDevice->CreateShaderResourceView(woodCrateTex.Get(), &srvDesc, hDescriptor);
 
-            // Offset to the object cbv in the descriptor heap.
-            int heapIndex = frameIndex*objCount + i;
-            auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(mCbvHeap->GetCPUDescriptorHandleForHeapStart());
-            handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
+	hDescriptor.Offset(1, mCbvSrvDescriptorSize);
+	
+	auto wireFenceTex = mTextures["bricksTex"]->Resource;
+ 
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = wireFenceTex->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = wireFenceTex->GetDesc().MipLevels;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-            D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-            cbvDesc.BufferLocation = cbAddress;
-            cbvDesc.SizeInBytes = objCBByteSize;
+	md3dDevice->CreateShaderResourceView(wireFenceTex.Get(), &srvDesc, hDescriptor);
 
-            md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
-        }
-    }
+	hDescriptor.Offset(1, mCbvSrvDescriptorSize);
+	
+	auto tileTex = mTextures["tileTex"]->Resource;
+ 
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = tileTex->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = tileTex->GetDesc().MipLevels;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-    UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstants));
+	md3dDevice->CreateShaderResourceView(tileTex.Get(), &srvDesc, hDescriptor);
 
-    // Last three descriptors are the pass CBVs for each frame resource.
-    for(int frameIndex = 0; frameIndex < gNumFrameResources; ++frameIndex)
-    {
-        auto passCB = mFrameResources[frameIndex]->PassCB->Resource();
-        D3D12_GPU_VIRTUAL_ADDRESS cbAddress = passCB->GetGPUVirtualAddress();
+	hDescriptor.Offset(1, mCbvSrvDescriptorSize);
 
-        // Offset to the pass cbv in the descriptor heap.
-        int heapIndex = mPassCbvOffset + frameIndex;
-        auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(mCbvHeap->GetCPUDescriptorHandleForHeapStart());
-        handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
+	auto grassTex = mTextures["grassTex"]->Resource;
+ 
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = grassTex->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = grassTex->GetDesc().MipLevels;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-        D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-        cbvDesc.BufferLocation = cbAddress;
-        cbvDesc.SizeInBytes = passCBByteSize;
-        
-        md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
-    }
+	md3dDevice->CreateShaderResourceView(grassTex.Get(), &srvDesc, hDescriptor);
+
+	hDescriptor.Offset(1, mCbvSrvDescriptorSize);
+
+	auto stoneTex = mTextures["stoneTex"]->Resource;
+ 
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = stoneTex->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = stoneTex->GetDesc().MipLevels;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+	md3dDevice->CreateShaderResourceView(stoneTex.Get(), &srvDesc, hDescriptor);
 }
 
 void ShapesApp::BuildRootSignature()
 {
-    CD3DX12_DESCRIPTOR_RANGE cbvTable0;
-    cbvTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-
-    CD3DX12_DESCRIPTOR_RANGE cbvTable1;
-    cbvTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-
+	CD3DX12_DESCRIPTOR_RANGE texTable;
+	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+	
 	// Root parameter can be a table, root descriptor or root constants.
-	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[4];
 
 	// Create root CBVs.
-    slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable0);
-    slotRootParameter[1].InitAsDescriptorTable(1, &cbvTable1);
+	slotRootParameter[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
+	slotRootParameter[1].InitAsConstantBufferView(0);
+	slotRootParameter[2].InitAsConstantBufferView(1);
+	slotRootParameter[3].InitAsConstantBufferView(2);
 
+	auto& staticSamplers = GetStaticSamplers();
+	
 	// A root signature is an array of root parameters.
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr, 
-        D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter, staticSamplers.size(), staticSamplers.data(),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
 	ComPtr<ID3DBlob> serializedRootSig = nullptr;
@@ -501,7 +640,7 @@ void ShapesApp::BuildRootSignature()
 	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
 		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
 
-	if(errorBlob != nullptr)
+	if (errorBlob != nullptr)
 	{
 		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
 	}
@@ -516,24 +655,26 @@ void ShapesApp::BuildRootSignature()
 
 void ShapesApp::BuildShadersAndInputLayout()
 {
-	mShaders["standardVS"] = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "VS", "vs_5_1");
-	mShaders["opaquePS"] = d3dUtil::CompileShader(L"Shaders\\color.hlsl", nullptr, "PS", "ps_5_1");
-	
-    mInputLayout =
-    {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-    };
+	mShaders["standardVS"] = d3dUtil::CompileShader(L"Shaders\\Default.hlsl", nullptr, "VS", "vs_5_1");
+	mShaders["opaquePS"] = d3dUtil::CompileShader(L"Shaders\\Default.hlsl", nullptr, "PS", "ps_5_1");
+
+	mInputLayout =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+	};
 }
 
 void ShapesApp::BuildShapeGeometry()
 {
-    GeometryGenerator geoGen;
-	GeometryGenerator::MeshData box = geoGen.CreateBox(1.5f, 0.5f, 1.5f, 3);
+	GeometryGenerator geoGen;
+	GeometryGenerator::MeshData box = geoGen.CreateBox(1.5f, 0.5f, 1.5f, 0);
 	GeometryGenerator::MeshData grid = geoGen.CreateGrid(30.0f, 30.0f, 60, 40);
 	GeometryGenerator::MeshData sphere = geoGen.CreateSphere(0.5f, 20, 20);
 	GeometryGenerator::MeshData cylinder = geoGen.CreateCylinder(0.5f, 0.5f, 3.0f, 20, 20);
-	GeometryGenerator::MeshData pyramid = geoGen.CreatePyramid(2.0f, 2.0f, 4.0f);
+	GeometryGenerator::MeshData pyramid = geoGen.CreatePyramid(1.5f, 1.5f, 2.0f);
 	GeometryGenerator::MeshData skull = geoGen.CreateSkull();
 
 	//
@@ -556,9 +697,9 @@ void ShapesApp::BuildShapeGeometry()
 	UINT cylinderIndexOffset = sphereIndexOffset + (UINT)sphere.Indices32.size();
 	UINT pyramidIndexOffset = cylinderIndexOffset + (UINT)cylinder.Indices32.size();
 	UINT skullIndexOffset = pyramidIndexOffset + (UINT)pyramid.Indices32.size();
-	
-    // Define the SubmeshGeometry that cover different 
-    // regions of the vertex/index buffers.
+
+	// Define the SubmeshGeometry that cover different 
+	// regions of the vertex/index buffers.
 
 	SubmeshGeometry boxSubmesh;
 	boxSubmesh.IndexCount = (UINT)box.Indices32.size();
@@ -600,46 +741,53 @@ void ShapesApp::BuildShapeGeometry()
 		grid.Vertices.size() +
 		sphere.Vertices.size() +
 		cylinder.Vertices.size() +
-        pyramid.Vertices.size() +
+		pyramid.Vertices.size() +
 		skull.Vertices.size();
 
 	std::vector<Vertex> vertices(totalVertexCount);
 
 	UINT k = 0;
-	for(size_t i = 0; i < box.Vertices.size(); ++i, ++k)
+	for (size_t i = 0; i < box.Vertices.size(); ++i, ++k)
 	{
 		vertices[k].Pos = box.Vertices[i].Position;
-        vertices[k].Color = XMFLOAT4(DirectX::Colors::DarkGreen);
+		vertices[k].Normal = box.Vertices[i].Normal;
+		vertices[k].Tangent = box.Vertices[i].TangentU;
+		vertices[k].UV = box.Vertices[i].TexC;
 	}
 
-	for(size_t i = 0; i < grid.Vertices.size(); ++i, ++k)
+	for (size_t i = 0; i < grid.Vertices.size(); ++i, ++k)
 	{
 		vertices[k].Pos = grid.Vertices[i].Position;
-        vertices[k].Color = XMFLOAT4(DirectX::Colors::ForestGreen);
+		vertices[k].Normal = grid.Vertices[i].Normal;
+		vertices[k].UV = grid.Vertices[i].TexC;
 	}
 
-	for(size_t i = 0; i < sphere.Vertices.size(); ++i, ++k)
+	for (size_t i = 0; i < sphere.Vertices.size(); ++i, ++k)
 	{
 		vertices[k].Pos = sphere.Vertices[i].Position;
-        vertices[k].Color = XMFLOAT4(DirectX::Colors::Crimson);
+		vertices[k].Normal = sphere.Vertices[i].Normal;
+		vertices[k].UV = sphere.Vertices[i].TexC;
 	}
 
-	for(size_t i = 0; i < cylinder.Vertices.size(); ++i, ++k)
+	for (size_t i = 0; i < cylinder.Vertices.size(); ++i, ++k)
 	{
 		vertices[k].Pos = cylinder.Vertices[i].Position;
-		vertices[k].Color = XMFLOAT4(DirectX::Colors::SteelBlue);
+		vertices[k].Normal = cylinder.Vertices[i].Normal;
+		vertices[k].UV = cylinder.Vertices[i].TexC;
 	}
 
-	for(size_t i = 0; i < pyramid.Vertices.size(); ++i, ++k)
+	for (size_t i = 0; i < pyramid.Vertices.size(); ++i, ++k)
 	{
 		vertices[k].Pos = pyramid.Vertices[i].Position;
-		vertices[k].Color = XMFLOAT4(DirectX::Colors::Azure);
+		vertices[k].Normal = pyramid.Vertices[i].Normal;
+		vertices[k].UV = pyramid.Vertices[i].TexC;
 	}
 
-	for(size_t i = 0; i < skull.Vertices.size(); ++i, ++k)
+	for (size_t i = 0; i < skull.Vertices.size(); ++i, ++k)
 	{
 		vertices[k].Pos = skull.Vertices[i].Position;
-		vertices[k].Color = XMFLOAT4(DirectX::Colors::Black);
+		vertices[k].Normal = skull.Vertices[i].Normal;
+		vertices[k].UV = skull.Vertices[i].TexC;
 	}
 
 	std::vector<std::uint16_t> indices;
@@ -650,8 +798,8 @@ void ShapesApp::BuildShapeGeometry()
 	indices.insert(indices.end(), std::begin(pyramid.GetIndices16()), std::end(pyramid.GetIndices16()));
 	indices.insert(indices.end(), std::begin(skull.GetIndices16()), std::end(skull.GetIndices16()));
 
-    const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
-    const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
+	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
+	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 
 	auto geo = std::make_unique<MeshGeometry>();
 	geo->Name = "shapeGeo";
@@ -683,28 +831,98 @@ void ShapesApp::BuildShapeGeometry()
 	mGeometries[geo->Name] = std::move(geo);
 }
 
+void ShapesApp::BuildMaterial()
+{
+	std::random_device rngDevice;
+	std::uniform_real_distribution<float> rngDist(0.0f, 1.0f);
+
+	unsigned int matCBIndex = 0;
+	for (int i = 0; i < 5; ++i)
+	{
+		const std::string cylinderName = "cylinder" + std::to_string(i);
+		std::unique_ptr<Material> cylinderMaterial = std::make_unique<Material>();
+		cylinderMaterial->Name = cylinderName;
+		cylinderMaterial->MatCBIndex = matCBIndex++;
+		cylinderMaterial->DiffuseSrvHeapIndex = 0;
+		cylinderMaterial->DiffuseAlbedo =
+			XMFLOAT4(rngDist(rngDevice), rngDist(rngDevice), rngDist(rngDevice), 1.0f);
+		cylinderMaterial->FresnelR0 = XMFLOAT3(0.01f, 0.01f, 0.01f);
+		cylinderMaterial->Roughness = 0.0f;
+
+		mMaterials[cylinderName] = std::move(cylinderMaterial);
+	}
+
+	for (int i = 0; i < 3; ++i)
+	{
+		const std::string pyramidName = "pyramid" + std::to_string(i);
+		std::unique_ptr<Material> pyramidMaterial = std::make_unique<Material>();
+		pyramidMaterial->Name = pyramidName;
+		pyramidMaterial->MatCBIndex = matCBIndex++;
+		pyramidMaterial->DiffuseSrvHeapIndex = 1;
+		pyramidMaterial->DiffuseAlbedo =
+			XMFLOAT4(rngDist(rngDevice), rngDist(rngDevice), rngDist(rngDevice), 1.0f);
+		pyramidMaterial->FresnelR0 = XMFLOAT3(0.01f, 0.01f, 0.01f);
+		pyramidMaterial->Roughness = 0.0f;
+
+		mMaterials[pyramidName] = std::move(pyramidMaterial);
+	}
+
+	std::unique_ptr<Material> gridMaterial = std::make_unique<Material>();
+	gridMaterial->Name = "grid";
+	gridMaterial->MatCBIndex = matCBIndex++;
+	gridMaterial->DiffuseSrvHeapIndex = 2;
+	gridMaterial->DiffuseAlbedo =
+		XMFLOAT4(rngDist(rngDevice), rngDist(rngDevice), rngDist(rngDevice), 1.0f);
+	gridMaterial->FresnelR0 = XMFLOAT3(0.01f, 0.01f, 0.01f);
+	gridMaterial->Roughness = 0.8f;
+
+	mMaterials["grid"] = std::move(gridMaterial);
+
+	std::unique_ptr<Material> boxMaterial = std::make_unique<Material>();
+	boxMaterial->Name = "box";
+	boxMaterial->MatCBIndex = matCBIndex++;
+	boxMaterial->DiffuseSrvHeapIndex = 3;
+	boxMaterial->DiffuseAlbedo =
+		XMFLOAT4(rngDist(rngDevice), rngDist(rngDevice), rngDist(rngDevice), 1.0f);
+	boxMaterial->FresnelR0 = XMFLOAT3(0.01f, 0.01f, 0.01f);
+	boxMaterial->Roughness = 1.0f;
+
+	mMaterials["box"] = std::move(boxMaterial);
+
+	std::unique_ptr<Material> skullMaterial = std::make_unique<Material>();
+	skullMaterial->Name = "skull";
+	skullMaterial->MatCBIndex = matCBIndex++;
+	skullMaterial->DiffuseSrvHeapIndex = 4;
+	skullMaterial->DiffuseAlbedo =
+		XMFLOAT4(rngDist(rngDevice), rngDist(rngDevice), rngDist(rngDevice), 1.0f);
+	skullMaterial->FresnelR0 = XMFLOAT3(0.01f, 0.01f, 0.01f);
+	skullMaterial->Roughness = 0.1f;
+
+	mMaterials["skull"] = std::move(skullMaterial);
+}
+
 void ShapesApp::BuildPSOs()
 {
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
 
 	//
 	// PSO for opaque objects.
 	//
-    ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+	ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	opaquePsoDesc.InputLayout = { mInputLayout.data(), (UINT)mInputLayout.size() };
 	opaquePsoDesc.pRootSignature = mRootSignature.Get();
-	opaquePsoDesc.VS = 
-	{ 
-		reinterpret_cast<BYTE*>(mShaders["standardVS"]->GetBufferPointer()), 
+	opaquePsoDesc.VS =
+	{
+		reinterpret_cast<BYTE*>(mShaders["standardVS"]->GetBufferPointer()),
 		mShaders["standardVS"]->GetBufferSize()
 	};
-	opaquePsoDesc.PS = 
-	{ 
+	opaquePsoDesc.PS =
+	{
 		reinterpret_cast<BYTE*>(mShaders["opaquePS"]->GetBufferPointer()),
 		mShaders["opaquePS"]->GetBufferSize()
 	};
 	opaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    opaquePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	opaquePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 	opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	opaquePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	opaquePsoDesc.SampleMask = UINT_MAX;
@@ -714,61 +932,64 @@ void ShapesApp::BuildPSOs()
 	opaquePsoDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;
 	opaquePsoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
 	opaquePsoDesc.DSVFormat = mDepthStencilFormat;
-    ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&mPSOs["opaque"])));
+	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&mPSOs["opaque"])));
 
 
-    //
-    // PSO for opaque wireframe objects.
-    //
+	//
+	// PSO for opaque wireframe objects.
+	//
 
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC opaqueWireframePsoDesc = opaquePsoDesc;
-    opaqueWireframePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
-    ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&opaqueWireframePsoDesc, IID_PPV_ARGS(&mPSOs["opaque_wireframe"])));
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC opaqueWireframePsoDesc = opaquePsoDesc;
+	opaqueWireframePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&opaqueWireframePsoDesc, IID_PPV_ARGS(&mPSOs["opaque_wireframe"])));
 }
 
 void ShapesApp::BuildFrameResources()
 {
-    for(int i = 0; i < gNumFrameResources; ++i)
-    {
-        mFrameResources.push_back(std::make_unique<FrameResource>(md3dDevice.Get(),
-            1, (UINT)mAllRitems.size()));
-    }
+	for (int i = 0; i < gNumFrameResources; ++i)
+	{
+		mFrameResources.push_back(std::make_unique<FrameResource>(
+			md3dDevice.Get(), 1, (UINT)mAllRitems.size(), (UINT)mMaterials.size()));
+	}
 }
 
 void ShapesApp::BuildRenderItems()
 {
 	auto boxRitem = std::make_unique<RenderItem>();
-	XMStoreFloat4x4(&boxRitem->World, XMMatrixScaling(2.0f, 2.0f, 2.0f)*XMMatrixTranslation(0.0f, 0.5f, 0.0f));
+	XMStoreFloat4x4(&boxRitem->World, XMMatrixScaling(2.0f, 2.0f, 2.0f) * XMMatrixTranslation(0.0f, 0.5f, 0.0f));
 	boxRitem->ObjCBIndex = 0;
 	boxRitem->Geo = mGeometries["shapeGeo"].get();
+	boxRitem->Mat = mMaterials["box"].get();
 	boxRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	boxRitem->IndexCount = boxRitem->Geo->DrawArgs["box"].IndexCount;
 	boxRitem->StartIndexLocation = boxRitem->Geo->DrawArgs["box"].StartIndexLocation;
 	boxRitem->BaseVertexLocation = boxRitem->Geo->DrawArgs["box"].BaseVertexLocation;
 	mAllRitems.push_back(std::move(boxRitem));
 
-    auto gridRitem = std::make_unique<RenderItem>();
-    gridRitem->World = MathHelper::Identity4x4();
-	gridRitem->ObjCBIndex = 0;
+	auto gridRitem = std::make_unique<RenderItem>();
+	gridRitem->World = MathHelper::Identity4x4();
+	gridRitem->ObjCBIndex = 1;
 	gridRitem->Geo = mGeometries["shapeGeo"].get();
+	gridRitem->Mat = mMaterials["grid"].get();
 	gridRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    gridRitem->IndexCount = gridRitem->Geo->DrawArgs["grid"].IndexCount;
-    gridRitem->StartIndexLocation = gridRitem->Geo->DrawArgs["grid"].StartIndexLocation;
-    gridRitem->BaseVertexLocation = gridRitem->Geo->DrawArgs["grid"].BaseVertexLocation;
+	gridRitem->IndexCount = gridRitem->Geo->DrawArgs["grid"].IndexCount;
+	gridRitem->StartIndexLocation = gridRitem->Geo->DrawArgs["grid"].StartIndexLocation;
+	gridRitem->BaseVertexLocation = gridRitem->Geo->DrawArgs["grid"].BaseVertexLocation;
 	mAllRitems.push_back(std::move(gridRitem));
-	
+
 	auto skullRitem = std::make_unique<RenderItem>();
-    XMStoreFloat4x4(&skullRitem->World, XMMatrixScaling(0.5f, 0.5f, 0.5f) * XMMatrixTranslation(0.0f, 1.0f, 0.0f));
+	XMStoreFloat4x4(&skullRitem->World, XMMatrixScaling(0.5f, 0.5f, 0.5f) * XMMatrixTranslation(0.0f, 1.0f, 0.0f));
 	skullRitem->ObjCBIndex = 2;
 	skullRitem->Geo = mGeometries["shapeGeo"].get();
+	skullRitem->Mat = mMaterials["skull"].get();
 	skullRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    skullRitem->IndexCount = skullRitem->Geo->DrawArgs["skull"].IndexCount;
-    skullRitem->StartIndexLocation = skullRitem->Geo->DrawArgs["skull"].StartIndexLocation;
-    skullRitem->BaseVertexLocation = skullRitem->Geo->DrawArgs["skull"].BaseVertexLocation;
+	skullRitem->IndexCount = skullRitem->Geo->DrawArgs["skull"].IndexCount;
+	skullRitem->StartIndexLocation = skullRitem->Geo->DrawArgs["skull"].StartIndexLocation;
+	skullRitem->BaseVertexLocation = skullRitem->Geo->DrawArgs["skull"].BaseVertexLocation;
 	mAllRitems.push_back(std::move(skullRitem));
-	
+
 	UINT objCBIndex = 3;
-	for(int i = 0; i < 5; ++i)
+	for (int i = 0; i < 5; ++i)
 	{
 		auto cylRitem = std::make_unique<RenderItem>();
 
@@ -776,9 +997,12 @@ void ShapesApp::BuildRenderItems()
 		std::uniform_real_distribution<> distribution(-10.0f, 10.0f);
 		XMMATRIX cylWorld = XMMatrixTranslation(distribution(randomDevice), 1.5f, distribution(randomDevice));
 
+		const std::string cylinderMatKey = "cylinder" + std::to_string(i);
+		
 		XMStoreFloat4x4(&cylRitem->World, cylWorld);
 		cylRitem->ObjCBIndex = objCBIndex++;
 		cylRitem->Geo = mGeometries["shapeGeo"].get();
+		cylRitem->Mat = mMaterials[cylinderMatKey].get();
 		cylRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		cylRitem->IndexCount = cylRitem->Geo->DrawArgs["cylinder"].IndexCount;
 		cylRitem->StartIndexLocation = cylRitem->Geo->DrawArgs["cylinder"].StartIndexLocation;
@@ -786,51 +1010,121 @@ void ShapesApp::BuildRenderItems()
 
 		mAllRitems.push_back(std::move(cylRitem));
 	}
-    
+
 	for (int i = 0; i < 3; ++i)
 	{
-        std::random_device randomDevice;
+		std::random_device randomDevice;
 		std::uniform_real_distribution<> distribution(-10.0f, 10.0f);
-		XMMATRIX pyramidWorld = XMMatrixTranslation(distribution(randomDevice), 0.0f, distribution(randomDevice));
+		const float locX = distribution(randomDevice);
+		const float locY = 0.0f;
+		const float locZ = distribution(randomDevice);
+		XMMATRIX pyramidWorld = XMMatrixTranslation(locX, locY, locZ);
+
+		const std::string pyramidMatKey = "pyramid" + std::to_string(i);
 		
 		auto pyramidRitem = std::make_unique<RenderItem>();
 		XMStoreFloat4x4(&pyramidRitem->World, pyramidWorld);
 		pyramidRitem->ObjCBIndex = objCBIndex++;
 		pyramidRitem->Geo = mGeometries["shapeGeo"].get();
+		pyramidRitem->Mat = mMaterials[pyramidMatKey].get();
 		pyramidRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		pyramidRitem->IndexCount = pyramidRitem->Geo->DrawArgs["pyramid"].IndexCount;
 		pyramidRitem->StartIndexLocation = pyramidRitem->Geo->DrawArgs["pyramid"].StartIndexLocation;
 		pyramidRitem->BaseVertexLocation = pyramidRitem->Geo->DrawArgs["pyramid"].BaseVertexLocation;
 		mAllRitems.push_back(std::move(pyramidRitem));
+		mPointLightLocation.push_back(std::forward<XMFLOAT3>(XMFLOAT3(locX, locY + 2.5f, locZ)));
 	}
-    
+
 	// All the render items are opaque.
-	for(auto& e : mAllRitems)
+	for (auto& e : mAllRitems)
 		mOpaqueRitems.push_back(e.get());
 }
 
 void ShapesApp::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems)
 {
-    UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
- 
+	UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+	UINT matCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(MaterialConstants));
+
 	auto objectCB = mCurrFrameResource->ObjectCB->Resource();
+	auto matCB = mCurrFrameResource->MaterialCB->Resource();
 
-    // For each render item...
-    for(size_t i = 0; i < ritems.size(); ++i)
-    {
-        auto ri = ritems[i];
+	// For each render item...
+	for (size_t i = 0; i < ritems.size(); ++i)
+	{
+		auto ri = ritems[i];
 
-        cmdList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
-        cmdList->IASetIndexBuffer(&ri->Geo->IndexBufferView());
-        cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
+		cmdList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
+		cmdList->IASetIndexBuffer(&ri->Geo->IndexBufferView());
+		cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
 
-        // Offset to the CBV in the descriptor heap for this object and for this frame resource.
-        UINT cbvIndex = mCurrFrameResourceIndex*(UINT)mOpaqueRitems.size() + ri->ObjCBIndex;
-        auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(mCbvHeap->GetGPUDescriptorHandleForHeapStart());
-        cbvHandle.Offset(cbvIndex, mCbvSrvUavDescriptorSize);
+		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(mSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		tex.Offset(ri->Mat->DiffuseSrvHeapIndex, mCbvSrvDescriptorSize);
 
-        cmdList->SetGraphicsRootDescriptorTable(0, cbvHandle);
+		D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress() + ri->ObjCBIndex * objCBByteSize;
+		D3D12_GPU_VIRTUAL_ADDRESS matCBAddress = matCB->GetGPUVirtualAddress() + ri->Mat->MatCBIndex * objCBByteSize;
 
-        cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
-    }
+		cmdList->SetGraphicsRootDescriptorTable(0, tex);
+		cmdList->SetGraphicsRootConstantBufferView(1, objCBAddress);
+		cmdList->SetGraphicsRootConstantBufferView(2, matCBAddress);
+
+		cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
+	}
 }
+
+std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> ShapesApp::GetStaticSamplers()
+{
+	// Applications usually only need a handful of samplers.  So just define them all up front
+	// and keep them available as part of the root signature.  
+
+	const CD3DX12_STATIC_SAMPLER_DESC pointWrap(
+		0, // shaderRegister
+		D3D12_FILTER_MIN_MAG_MIP_POINT, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP); // addressW
+
+	const CD3DX12_STATIC_SAMPLER_DESC pointClamp(
+		1, // shaderRegister
+		D3D12_FILTER_MIN_MAG_MIP_POINT, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+
+	const CD3DX12_STATIC_SAMPLER_DESC linearWrap(
+		2, // shaderRegister
+		D3D12_FILTER_MIN_MAG_MIP_LINEAR, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP); // addressW
+
+	const CD3DX12_STATIC_SAMPLER_DESC linearClamp(
+		3, // shaderRegister
+		D3D12_FILTER_MIN_MAG_MIP_LINEAR, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+
+	const CD3DX12_STATIC_SAMPLER_DESC anisotropicWrap(
+		4, // shaderRegister
+		D3D12_FILTER_ANISOTROPIC, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressW
+		0.0f,                             // mipLODBias
+		8);                               // maxAnisotropy
+
+	const CD3DX12_STATIC_SAMPLER_DESC anisotropicClamp(
+		5, // shaderRegister
+		D3D12_FILTER_ANISOTROPIC, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressW
+		0.0f,                              // mipLODBias
+		8);                                // maxAnisotropy
+
+	return { 
+		pointWrap, pointClamp,
+		linearWrap, linearClamp, 
+		anisotropicWrap, anisotropicClamp };
+}
+

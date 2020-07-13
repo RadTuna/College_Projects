@@ -551,6 +551,22 @@ void GeometryGenerator::BuildCylinderBottomCap(float bottomRadius, float topRadi
 	}
 }
 
+DirectX::XMVECTOR GeometryGenerator::CalcTriangleNormal(
+	DirectX::FXMVECTOR vertex0, DirectX::FXMVECTOR vertex1, DirectX::FXMVECTOR vertex2)
+{
+	const XMVECTOR toVertex1 = vertex1 - vertex0;
+	const XMVECTOR toVertex2 = vertex2 - vertex0;
+
+	const XMVECTOR normalVector = XMVector3Cross(toVertex1, toVertex2);
+	return XMVector3Normalize(normalVector);
+}
+
+DirectX::XMVECTOR GeometryGenerator::CalcTangentFromNormal(DirectX::FXMVECTOR normal, DirectX::FXMVECTOR base)
+{
+	const XMVECTOR tangentVector = XMVector3Cross(normal, base);
+	return XMVector3Normalize(tangentVector);
+}
+
 GeometryGenerator::MeshData GeometryGenerator::CreateGrid(float width, float depth, uint32 m, uint32 n)
 {
     MeshData meshData;
@@ -663,61 +679,59 @@ GeometryGenerator::MeshData GeometryGenerator::CreatePyramid(float x, float z, f
 {
 	MeshData meshData;
 
-	meshData.Vertices.resize(5);
-	meshData.Indices32.resize(18);
-
 	const float halfX = x * 0.5f;
 	const float halfZ = z * 0.5f;
 
-	meshData.Vertices[0] = Vertex(
-		0.0f, h, 0.0f, 
-		0.0f, 0.0f, 0.0f, 
-		0.0f, 0.0f, 0.0f, 
-		0.0f, 0.0f);
-	meshData.Vertices[1] = Vertex(
-		-halfX, 0.0f, -halfZ, 
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 
-		0.0f, 0.0f);
-	meshData.Vertices[2] = Vertex(
-		halfX, 0.0f, -halfZ, 
-		0.0f, 0.0f, 0.0f, 
-		0.0f, 0.0f, 0.0f, 
-		0.0f, 0.0f);
-	meshData.Vertices[3] = Vertex(
-		halfX, 0.0f, halfZ, 
-		0.0f, 0.0f, 0.0f, 
-		0.0f, 0.0f, 0.0f, 
-		0.0f, 0.0f);
-	meshData.Vertices[4] = Vertex(
-		-halfX, 0.0f, halfZ, 
-		0.0f, 0.0f, 0.0f, 
-		0.0f, 0.0f, 0.0f, 
-		0.0f, 0.0f);
+	const XMVECTOR baseVertices[5] = {
+		XMVectorSet(0.0f, h, 0.0f, 1.0f),
+		XMVectorSet(-halfX, 0.0f, -halfZ, 1.0f),
+		XMVectorSet(halfX, 0.0f, -halfZ, 1.0f),
+		XMVectorSet(halfX, 0.0f, halfZ, 1.0f),
+		XMVectorSet(-halfX, 0.0f, halfZ, 1.0f)};
 
-	meshData.Indices32[0] = 0;
-	meshData.Indices32[1] = 2;
-	meshData.Indices32[2] = 1;
+	const unsigned int baseIndices[18] = {
+		0, 2, 1,
+		0, 3, 2,
+		0, 4, 3,
+		0, 1, 4,
+		1, 2, 3,
+		1, 3, 4 };
 	
-	meshData.Indices32[3] = 0;
-	meshData.Indices32[4] = 3;
-	meshData.Indices32[5] = 2;
-	
-	meshData.Indices32[6] = 0;
-	meshData.Indices32[7] = 4;
-	meshData.Indices32[8] = 3;
-	
-	meshData.Indices32[9] = 0;
-	meshData.Indices32[10] = 1;
-	meshData.Indices32[11] = 4;
-	
-	meshData.Indices32[12] = 1;
-	meshData.Indices32[13] = 2;
-	meshData.Indices32[14] = 3;
-	
-	meshData.Indices32[15] = 1;
-	meshData.Indices32[16] = 3;
-	meshData.Indices32[17] = 4;
+	const XMVECTOR upVector = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	for (int i = 0; i < 18; i += 3)
+	{
+		Vertex vertex[3];
+
+		const XMVECTOR vertex0 = baseVertices[baseIndices[i + 0]];
+		const XMVECTOR vertex1 = baseVertices[baseIndices[i + 1]];
+		const XMVECTOR vertex2 = baseVertices[baseIndices[i + 2]];
+		
+		XMStoreFloat3(&vertex[0].Position, vertex0);
+		XMStoreFloat3(&vertex[1].Position, vertex1);
+		XMStoreFloat3(&vertex[2].Position, vertex2);
+
+		const XMVECTOR normal = CalcTriangleNormal(vertex0, vertex1, vertex2);
+		
+		XMStoreFloat3(&vertex[0].Normal, normal);
+		XMStoreFloat3(&vertex[1].Normal, normal);
+		XMStoreFloat3(&vertex[2].Normal, normal);
+
+		const XMVECTOR tangent = CalcTangentFromNormal(normal, upVector);
+		
+		XMStoreFloat3(&vertex[0].TangentU, tangent);
+		XMStoreFloat3(&vertex[1].TangentU, tangent);
+		XMStoreFloat3(&vertex[2].TangentU, tangent);
+
+		vertex[0].TexC = { 0.5f, 0.0f };
+		vertex[1].TexC = { 0.0f, 1.0f };
+		vertex[2].TexC = { 1.0f, 1.0f };
+
+		for (int k = 0; k < 3; ++k)
+		{
+			meshData.Vertices.emplace_back(vertex[k]);
+			meshData.Indices32.emplace_back(i + k);
+		}
+	}
 
 	return meshData;
 }

@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{ae752e93-4afd-40ca-95ea-ad88cf734059}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{93333179-848e-4550-847e-5fb15254d1ec}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\common\Camera.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\d3dApp.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\d3dUtil.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\DDSTextureLoader.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\GameTimer.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\GeometryGenerator.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\MathHelper.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameResource.cpp" />
+    <ClCompile Include="TexWavesApp.cpp" />
+    <ClCompile Include="Waves.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common\Camera.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\d3dApp.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\d3dUtil.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\d3dx12.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\DDSTextureLoader.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\GameTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\GeometryGenerator.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\MathHelper.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\UploadBuffer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameResource.h" />
+    <ClInclude Include="Waves.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\Default.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\LightingUtil.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>

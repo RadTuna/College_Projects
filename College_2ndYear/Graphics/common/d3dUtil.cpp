@@ -53,6 +53,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> d3dUtil::CreateDefaultBuffer(
         nullptr,
         IID_PPV_ARGS(defaultBuffer.GetAddressOf())));
 
+
     // In order to copy CPU memory data into our default buffer, we need to create
     // an intermediate upload heap. 
     ThrowIfFailed(device->CreateCommittedResource(
