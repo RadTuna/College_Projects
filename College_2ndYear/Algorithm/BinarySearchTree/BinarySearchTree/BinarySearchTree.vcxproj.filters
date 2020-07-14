@@ -2,10 +2,48 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="TimeCounter.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BinarySearchTree.h" />
-    <ClInclude Include="BinarySerachTree.hpp" />
-    <ClInclude Include="TreeMap.h" />
+    <ClInclude Include="BinarySearchTree.h">
+      <Filter>BinarySearchTree</Filter>
+    </ClInclude>
+    <ClInclude Include="BinarySerachTree.hpp">
+      <Filter>BinarySearchTree</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeMap.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="AVLTree.h">
+      <Filter>AVLTree</Filter>
+    </ClInclude>
+    <ClInclude Include="AVLTree.hpp">
+      <Filter>AVLTree</Filter>
+    </ClInclude>
+    <ClInclude Include="RedBlackTree.h">
+      <Filter>RedBlackTree</Filter>
+    </ClInclude>
+    <ClInclude Include="RedBlackTree.hpp">
+      <Filter>RedBlackTree</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeCounter.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Base">
+      <UniqueIdentifier>{a39984f0-268a-44c3-95df-88875626fa41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BinarySearchTree">
+      <UniqueIdentifier>{88fa99fb-2218-4238-8982-5cad00676277}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AVLTree">
+      <UniqueIdentifier>{452835ee-201f-4173-97a0-d2c20c54e07e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RedBlackTree">
+      <UniqueIdentifier>{f22634fe-8274-4bb6-846c-35dfd82e3e3d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

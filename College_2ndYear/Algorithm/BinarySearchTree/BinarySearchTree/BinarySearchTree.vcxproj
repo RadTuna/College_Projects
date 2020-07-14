@@ -140,10 +140,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="TimeCounter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AVLTree.h" />
+    <ClInclude Include="AVLTree.hpp" />
     <ClInclude Include="BinarySearchTree.h" />
     <ClInclude Include="BinarySerachTree.hpp" />
+    <ClInclude Include="RedBlackTree.h" />
+    <ClInclude Include="RedBlackTree.hpp" />
+    <ClInclude Include="TimeCounter.h" />
     <ClInclude Include="TreeMap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

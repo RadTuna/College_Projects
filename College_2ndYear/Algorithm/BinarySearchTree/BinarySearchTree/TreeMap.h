@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 template<typename K, typename D>
 class TreeMap
 {
