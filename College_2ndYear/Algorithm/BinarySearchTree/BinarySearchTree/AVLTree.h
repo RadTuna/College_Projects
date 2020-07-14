@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TreeMap.h"
+#include "ITreeMap.h"
 
 template<typename K, typename D>
 struct AVLNode
@@ -13,7 +13,7 @@ struct AVLNode
 };
 
 template<typename K, typename D>
-class AVLTree final : public TreeMap<K, D>
+class AVLTree final : public ITreeMap<K, D>
 {
 public:
 
@@ -25,6 +25,7 @@ public:
 	bool Delete(const K& key) override;
 	
 	uint32_t GetSize() const override;
+	uint32_t GetHeight() const override;
 	void PrintTree() const override;
 
 private:
@@ -36,8 +37,8 @@ private:
 	bool SearchNodeInternal(AVLNode<K, D>** outNode, const K& key) const;
 	void PrintTreeInternal(AVLNode<K, D>* node) const;
 
-	uint32_t GetBalanceFactor(AVLNode<K, D>* node) const;
-	int32_t GetTreeHeight(AVLNode<K, D>* node) const;
+	int32_t GetBalanceFactor(AVLNode<K, D>* node) const;
+	uint32_t GetTreeHeight(AVLNode<K, D>* node) const;
 
 	void LLRotation(AVLNode<K, D>* node);
 	void RRRotation(AVLNode<K, D>* node);

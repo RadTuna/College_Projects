@@ -111,6 +111,12 @@ uint32_t AVLTree<K, D>::GetSize() const
 }
 
 template <typename K, typename D>
+uint32_t AVLTree<K, D>::GetHeight() const
+{
+	return GetTreeHeight(mRoot);
+}
+
+template <typename K, typename D>
 void AVLTree<K, D>::PrintTree() const
 {
 	PrintTreeInternal(mRoot);
@@ -241,7 +247,7 @@ void AVLTree<K, D>::PrintTreeInternal(AVLNode<K, D>* node) const
 }
 
 template <typename K, typename D>
-uint32_t AVLTree<K, D>::GetBalanceFactor(AVLNode<K, D>* node) const
+int32_t AVLTree<K, D>::GetBalanceFactor(AVLNode<K, D>* node) const
 {
 	uint32_t leftHeight = 0;
 	if (node->Left != nullptr)
@@ -259,7 +265,7 @@ uint32_t AVLTree<K, D>::GetBalanceFactor(AVLNode<K, D>* node) const
 }
 
 template <typename K, typename D>
-int32_t AVLTree<K, D>::GetTreeHeight(AVLNode<K, D>* node) const
+uint32_t AVLTree<K, D>::GetTreeHeight(AVLNode<K, D>* node) const
 {
 	if (node == nullptr)
 	{

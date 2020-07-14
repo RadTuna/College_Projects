@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TreeMap.h"
+#include "ITreeMap.h"
 
 enum class ERBColor
 {
@@ -20,7 +20,7 @@ struct RBNode
 };
 
 template<typename K, typename D>
-class RedBlackTree final : public TreeMap<K, D>
+class RedBlackTree final : public ITreeMap<K, D>
 {
 public:
 
@@ -32,6 +32,7 @@ public:
 	bool Delete(const K& key) override;
 	
 	uint32_t GetSize() const override;
+	uint32_t GetHeight() const override;
 	void PrintTree() const override;
 
 private:
@@ -43,11 +44,17 @@ private:
 	bool SearchNodeInternal(RBNode<K, D>** outNode, const K& key) const;
 	void PrintTreeInternal(RBNode<K, D>* node) const;
 
-	uint32_t GetBalanceFactor(RBNode<K, D>* node) const;
-	int32_t GetTreeHeight(RBNode<K, D>* node) const;
+	int32_t GetBalanceFactor(RBNode<K, D>* node) const;
+	uint32_t GetTreeHeight(RBNode<K, D>* node) const;
 
 	void LLRotation(RBNode<K, D>* node);
 	void RRRotation(RBNode<K, D>* node);
+
+	void CheckParentColor(RBNode<K, D>* node);
+	void Restructuring(RBNode<K, D>* node);
+	void Recoloring(RBNode<K, D>* node);
+	RBNode<K, D>* GetSiblingNode(RBNode<K, D>* node);
+	void SwapChildNode(RBNode<K, D>* targetNode, RBNode<K, D>* oldNode, RBNode<K, D>* newNode);
 	
 private:
 

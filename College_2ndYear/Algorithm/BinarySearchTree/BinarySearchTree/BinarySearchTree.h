@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TreeMap.h"
+#include "ITreeMap.h"
 
 template<typename K, typename D>
 struct BSTNode
@@ -13,7 +13,7 @@ struct BSTNode
 };
 
 template<typename K, typename D>
-class BinarySearchTree final : public TreeMap<K, D>
+class BinarySearchTree final : public ITreeMap<K, D>
 {
 public:
 
@@ -25,6 +25,7 @@ public:
 	bool Delete(const K& key) override;
 	
 	uint32_t GetSize() const override;
+	uint32_t GetHeight() const override;
 	void PrintTree() const override;
 
 private:
@@ -35,6 +36,8 @@ private:
 	void DeleteInternal(BSTNode<K ,D>* findNode);
 	bool SearchNodeInternal(BSTNode<K, D>** outNode, const K& key) const;
 	void PrintTreeInternal(BSTNode<K, D>* node) const;
+
+	int32_t GetTreeHeight(BSTNode<K, D>* node) const;
 	
 private:
 

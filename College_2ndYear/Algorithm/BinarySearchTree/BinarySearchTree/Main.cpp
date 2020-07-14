@@ -3,9 +3,11 @@
 #include <map>
 #include <iostream>
 #include <array>
+#include <random>
 
 #include "BinarySearchTree.h"
 #include "AVLTree.h"
+#include "RedBlackTree.h"
 #include "TimeCounter.h"
 
 #define LINE_SEPARATOR std::cout << "\n===========================\n" << std::endl
@@ -43,26 +45,44 @@ enum class ETreeType
 
 int main()
 {
-	std::array<std::pair<int32_t, std::string>, 10> insertTestCase = {
-		std::pair<int32_t, std::string>(57, "테스트 문장 57"),
-		std::pair<int32_t, std::string>(41, "테스트 문장 41"),
-		std::pair<int32_t, std::string>(11, "테스트 문장 11"),
-		std::pair<int32_t, std::string>(89, "테스트 문장 89"),
-		std::pair<int32_t, std::string>(54, "테스트 문장 54"),
-		std::pair<int32_t, std::string>(8, "테스트 문장 8"),
-		std::pair<int32_t, std::string>(37, "테스트 문장 37"),
-		std::pair<int32_t, std::string>(20, "테스트 문장 20"),
-		std::pair<int32_t, std::string>(50, "테스트 문장 50"),
-		std::pair<int32_t, std::string>(40, "테스트 문장 40")
-	};
+	enum { TEST_CASE_SIZE = 10000, SEARCH_CASE_DIV_FACTOR = 100 };
 	
-	std::array<int32_t, 10> searchTestCase = { 57, 41, 11, 89, 54,
-		8, 37, 20, 50, 40 };
-	std::array<int32_t, 5> deleteTestCase = { 11, 57, 97, 50, 89 };
+	std::random_device rngDev;
+	std::uniform_int_distribution<int32_t> uniformDist(0, TEST_CASE_SIZE);
+	std::vector<std::pair<int32_t, std::string>> insertTestCase;
+	insertTestCase.reserve(TEST_CASE_SIZE + 16);
+	for (uint32_t i = 0; i < TEST_CASE_SIZE; ++i)
+	{
+		int32_t rngValue = uniformDist(rngDev);
+		insertTestCase.emplace_back(rngValue, "테스트 문장");
+	}
+
+	std::vector<int32_t> searchTestCase;
+	searchTestCase.reserve(TEST_CASE_SIZE / SEARCH_CASE_DIV_FACTOR + 16);
+	const uint32_t searchTestCaseSize = TEST_CASE_SIZE / SEARCH_CASE_DIV_FACTOR;
+	for (uint32_t i = 0; i < searchTestCaseSize; ++i)
+	{
+		searchTestCase.emplace_back(insertTestCase[i].first);
+	}
 	
-	std::map<ETreeType, TreeMap<int32_t, std::string>*> TreeMaps;
+	std::vector<int32_t> deleteTestCase;
+	deleteTestCase.reserve(TEST_CASE_SIZE + 16);
+	for (std::pair<int32_t, std::string> pair : insertTestCase)
+	{
+		deleteTestCase.emplace_back(pair.first);
+	}
+	
+	std::shuffle(insertTestCase.begin(), insertTestCase.end(), rngDev);
+	std::shuffle(searchTestCase.begin(), searchTestCase.end(), rngDev);
+	std::shuffle(deleteTestCase.begin(), deleteTestCase.end(), rngDev);
+
+	std::sort(insertTestCase.begin(), insertTestCase.end());
+
+	
+	std::map<ETreeType, ITreeMap<int32_t, std::string>*> TreeMaps;
 	TreeMaps[ETreeType::BinarySearchTree] = new BinarySearchTree<int32_t, std::string>();
 	TreeMaps[ETreeType::AVLTree] = new AVLTree<int32_t, std::string>();
+	TreeMaps[ETreeType::RedBlackTree] = new RedBlackTree<int32_t, std::string>();
 	TimeCounter::CreateInstance();
 	std::string dummy;
 
@@ -71,8 +91,9 @@ int main()
 	std::cout << "BinarySearchTree" << std::endl;
 	std::cout << "Insert" << std::endl;
 	INSERT_TEST(ETreeType::BinarySearchTree, insertTestCase);
-	TreeMaps[ETreeType::BinarySearchTree]->PrintTree();
+	//TreeMaps[ETreeType::BinarySearchTree]->PrintTree();
 	std::cout << "Time : " << TimeCounter::GetInstance()->GetDeltaTime() << "ms" << std::endl;
+	std::cout << "TreeHeight : " << TreeMaps[ETreeType::BinarySearchTree]->GetHeight() << std::endl;
 	LINE_SEPARATOR;
 
 	std::cout << "Search" << std::endl;
@@ -82,25 +103,45 @@ int main()
 
 	std::cout << "Delete" << std::endl;
 	DELETE_TEST(ETreeType::BinarySearchTree, deleteTestCase);
-	TreeMaps[ETreeType::BinarySearchTree]->PrintTree();
+	//TreeMaps[ETreeType::BinarySearchTree]->PrintTree();
 	std::cout << "Time : " << TimeCounter::GetInstance()->GetDeltaTime() << "ms" << std::endl;
 	LINE_SEPARATOR;
 
 	std::cout << "AVL Tree" << std::endl;
 	std::cout << "Insert" << std::endl;
 	INSERT_TEST(ETreeType::AVLTree, insertTestCase);
-	TreeMaps[ETreeType::AVLTree]->PrintTree();
+	//TreeMaps[ETreeType::AVLTree]->PrintTree();
 	std::cout << "Time : " << TimeCounter::GetInstance()->GetDeltaTime() << "ms" << std::endl;
+	std::cout << "TreeHeight : " << TreeMaps[ETreeType::AVLTree]->GetHeight() << std::endl;
 	LINE_SEPARATOR;
 	
 	std::cout << "Search" << std::endl;
-	SEARCH_TEST(ETreeType::BinarySearchTree, searchTestCase, dummy);
+	SEARCH_TEST(ETreeType::AVLTree, searchTestCase, dummy);
 	std::cout << "Time : " << TimeCounter::GetInstance()->GetDeltaTime() << "ms" << std::endl;
 	LINE_SEPARATOR;
 
 	std::cout << "Delete" << std::endl;
 	DELETE_TEST(ETreeType::AVLTree, deleteTestCase);
-	TreeMaps[ETreeType::AVLTree]->PrintTree();
+	//TreeMaps[ETreeType::AVLTree]->PrintTree();
+	std::cout << "Time : " << TimeCounter::GetInstance()->GetDeltaTime() << "ms" << std::endl;
+	LINE_SEPARATOR;
+
+	std::cout << "RedBlack Tree" << std::endl;
+	std::cout << "Insert" << std::endl;
+	INSERT_TEST(ETreeType::RedBlackTree, insertTestCase);
+	//TreeMaps[ETreeType::RedBlackTree]->PrintTree();
+	std::cout << "Time : " << TimeCounter::GetInstance()->GetDeltaTime() << "ms" << std::endl;
+	std::cout << "TreeHeight : " << TreeMaps[ETreeType::RedBlackTree]->GetHeight() << std::endl;
+	LINE_SEPARATOR;
+	
+	std::cout << "Search" << std::endl;
+	SEARCH_TEST(ETreeType::RedBlackTree, searchTestCase, dummy);
+	std::cout << "Time : " << TimeCounter::GetInstance()->GetDeltaTime() << "ms" << std::endl;
+	LINE_SEPARATOR;
+
+	std::cout << "Delete" << std::endl;
+	DELETE_TEST(ETreeType::RedBlackTree, deleteTestCase);
+	//TreeMaps[ETreeType::RedBlackTree]->PrintTree();
 	std::cout << "Time : " << TimeCounter::GetInstance()->GetDeltaTime() << "ms" << std::endl;
 	LINE_SEPARATOR;
 

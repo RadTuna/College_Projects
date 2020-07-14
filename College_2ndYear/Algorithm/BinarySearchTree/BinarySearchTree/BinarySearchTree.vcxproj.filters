@@ -13,9 +13,6 @@
     <ClInclude Include="BinarySerachTree.hpp">
       <Filter>BinarySearchTree</Filter>
     </ClInclude>
-    <ClInclude Include="TreeMap.h">
-      <Filter>Base</Filter>
-    </ClInclude>
     <ClInclude Include="AVLTree.h">
       <Filter>AVLTree</Filter>
     </ClInclude>
@@ -29,6 +26,9 @@
       <Filter>RedBlackTree</Filter>
     </ClInclude>
     <ClInclude Include="TimeCounter.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="ITreeMap.h">
       <Filter>Base</Filter>
     </ClInclude>
   </ItemGroup>

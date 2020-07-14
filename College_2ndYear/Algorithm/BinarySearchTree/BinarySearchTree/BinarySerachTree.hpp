@@ -2,6 +2,7 @@
 
 #include "BinarySearchTree.h"
 #include <iostream>
+#include <algorithm>
 
 template <typename K, typename D>
 BinarySearchTree<K, D>::~BinarySearchTree() noexcept
@@ -98,6 +99,12 @@ template <typename K, typename D>
 uint32_t BinarySearchTree<K, D>::GetSize() const
 {
 	return mSize;
+}
+
+template <typename K, typename D>
+uint32_t BinarySearchTree<K, D>::GetHeight() const
+{
+	return GetTreeHeight(mRoot);
 }
 
 template <typename K, typename D>
@@ -230,4 +237,27 @@ void BinarySearchTree<K, D>::PrintTreeInternal(BSTNode<K, D>* node) const
 	}
 }
 
+
+template <typename K, typename D>
+int32_t BinarySearchTree<K, D>::GetTreeHeight(BSTNode<K, D>* node) const
+{
+	if (node == nullptr)
+	{
+		return 0;
+	}
+	
+	int32_t leftHeight = 0;
+	if (node->Left != nullptr)
+	{
+		leftHeight = GetTreeHeight(node->Left);
+	}
+
+	int32_t rightHeight = 0;
+	if (node->Right != nullptr)
+	{
+		rightHeight = GetTreeHeight(node->Right);
+	}
+
+	return std::max(leftHeight, rightHeight) + 1;
+}
 
