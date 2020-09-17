@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Weather">
+      <UniqueIdentifier>{ec840d53-fafc-4cef-9501-046e55ca169c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Display">
+      <UniqueIdentifier>{3cdf10f1-76bb-401d-8fad-bf3960bc907c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IObserver.h">
+      <Filter>Display</Filter>
+    </ClInclude>
+    <ClInclude Include="WeatherMediator.h">
+      <Filter>Weather</Filter>
+    </ClInclude>
+    <ClInclude Include="WeatherData.h">
+      <Filter>Weather</Filter>
+    </ClInclude>
+    <ClInclude Include="WeatherStation.h">
+      <Filter>Weather</Filter>
+    </ClInclude>
+    <ClInclude Include="IDisplay.h">
+      <Filter>Display</Filter>
+    </ClInclude>
+    <ClInclude Include="CurrentCondition.h">
+      <Filter>Display</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticsDisplay.h">
+      <Filter>Display</Filter>
+    </ClInclude>
+    <ClInclude Include="ForecastDisplay.h">
+      <Filter>Display</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WeatherStation.cpp">
+      <Filter>Weather</Filter>
+    </ClCompile>
+    <ClCompile Include="CurrentCondition.cpp">
+      <Filter>Display</Filter>
+    </ClCompile>
+    <ClCompile Include="ForecastDisplay.cpp">
+      <Filter>Display</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticsDisplay.cpp">
+      <Filter>Display</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+</Project>

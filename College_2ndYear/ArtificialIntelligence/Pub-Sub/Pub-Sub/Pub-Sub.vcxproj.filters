@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Nawspaper">
+      <UniqueIdentifier>{91203b24-4d75-47f5-a9bc-b593a9ed08b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Subscriber">
+      <UniqueIdentifier>{41f2889e-9823-4697-9fa4-56b6882b6e06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Delegates">
+      <UniqueIdentifier>{f952bad1-c333-4c91-b2e8-3595f6994824}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="NewspaperData.h">
+      <Filter>Nawspaper</Filter>
+    </ClInclude>
+    <ClInclude Include="IObserver.h">
+      <Filter>Delegates</Filter>
+    </ClInclude>
+    <ClInclude Include="Subject.h">
+      <Filter>Delegates</Filter>
+    </ClInclude>
+    <ClInclude Include="Reporter.h">
+      <Filter>Nawspaper</Filter>
+    </ClInclude>
+    <ClInclude Include="PCDisplay.h">
+      <Filter>Subscriber</Filter>
+    </ClInclude>
+    <ClInclude Include="SmartphoneDisplay.h">
+      <Filter>Subscriber</Filter>
+    </ClInclude>
+    <ClInclude Include="IDisplay.h">
+      <Filter>Subscriber</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Reporter.cpp">
+      <Filter>Nawspaper</Filter>
+    </ClCompile>
+    <ClCompile Include="PCDisplay.cpp">
+      <Filter>Subscriber</Filter>
+    </ClCompile>
+    <ClCompile Include="SmartphoneDisplay.cpp">
+      <Filter>Subscriber</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+</Project>
