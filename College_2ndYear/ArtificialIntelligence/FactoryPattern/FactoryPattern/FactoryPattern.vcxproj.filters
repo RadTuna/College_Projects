@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Factory">
+      <UniqueIdentifier>{3e536a75-a774-45ab-9a0c-cc55e43b7abe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pizza">
+      <UniqueIdentifier>{320f689f-c727-45df-ae88-212f60119d5a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Pizza.h">
+      <Filter>Pizza</Filter>
+    </ClInclude>
+    <ClInclude Include="PizzaStore.h">
+      <Filter>Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="PizzaType.h">
+      <Filter>Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="ChicagePizzaStore.h">
+      <Filter>Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="ChicagoCheesePizza.h">
+      <Filter>Pizza</Filter>
+    </ClInclude>
+    <ClInclude Include="ChicagoPeperoniPizza.h">
+      <Filter>Pizza</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PizzaStore.cpp">
+      <Filter>Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="ChicagoPizzaStore.cpp">
+      <Filter>Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Pizza.cpp">
+      <Filter>Pizza</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+</Project>

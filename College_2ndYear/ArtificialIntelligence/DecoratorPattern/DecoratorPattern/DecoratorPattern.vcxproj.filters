@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Pattern">
+      <UniqueIdentifier>{a4cf770d-1021-432d-93ed-b45d7a0a6c78}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IComponent.h">
+      <Filter>Pattern</Filter>
+    </ClInclude>
+    <ClInclude Include="IDecorator.h">
+      <Filter>Pattern</Filter>
+    </ClInclude>
+    <ClInclude Include="Coffee.h">
+      <Filter>Pattern</Filter>
+    </ClInclude>
+    <ClInclude Include="Mocha.h">
+      <Filter>Pattern</Filter>
+    </ClInclude>
+    <ClInclude Include="Whip.h">
+      <Filter>Pattern</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+</Project>
