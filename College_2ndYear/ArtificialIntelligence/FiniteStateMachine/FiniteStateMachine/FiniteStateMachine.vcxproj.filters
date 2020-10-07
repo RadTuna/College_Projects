@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Generic">
+      <UniqueIdentifier>{e99be991-0d9d-4801-9687-844c6c70b277}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Concrete">
+      <UniqueIdentifier>{e93c61ad-fdba-4a16-bab6-2b8f4e8154c7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="TrafficLight.cpp">
+      <Filter>Concrete</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="StateMachine.h">
+      <Filter>Generic</Filter>
+    </ClInclude>
+    <ClInclude Include="Transition.h">
+      <Filter>Generic</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Generic</Filter>
+    </ClInclude>
+    <ClInclude Include="TrafficLight.h">
+      <Filter>Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="FromRedToYellow.h">
+      <Filter>Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="FromYellowToGreen.h">
+      <Filter>Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="FromGreenToRed.h">
+      <Filter>Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="RedState.h">
+      <Filter>Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="GreenState.h">
+      <Filter>Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="YellowState.h">
+      <Filter>Concrete</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
