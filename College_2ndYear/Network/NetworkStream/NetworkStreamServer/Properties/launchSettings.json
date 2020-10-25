@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NetworkStreamServer": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\NetTest\\Server\\ServerTest.txt"
+    }
+  }
+}

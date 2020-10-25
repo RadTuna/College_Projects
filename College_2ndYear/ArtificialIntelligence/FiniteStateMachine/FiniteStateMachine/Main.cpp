@@ -3,42 +3,46 @@
 #include <cassert>
 
 #include "StateMachine.h"
-#include "TrafficLight.h"
-#include "RedState.h"
-#include "YellowState.h"
-#include "GreenState.h"
-#include "FromRedToYellow.h"
-#include "FromYellowToGreen.h"
-#include "FromGreenToRed.h"
+
+#include "MineAndDig.h"
+#include "QuenchThirst.h"
+#include "DepositGold.h"
+#include "SleepAndRest.h"
+
+#include "FromBankToHome.h"
+#include "FromBankToMine.h"
+#include "FromHomeToMine.h"
+#include "FromMineToBank.h"
+#include "FromMineToThirst.h"
+#include "FromThirstToMine.h"
 
 int main()
 {
-    StateMachine<TrafficLight> stateMachine;
+    enum { LOOP_LIMIT = 100 };
 
-    const State<TrafficLight>* redState = stateMachine.AddState(std::make_unique<RedState>());
-    const State<TrafficLight>* yellowState = stateMachine.AddState(std::make_unique<YellowState>());
-    const State<TrafficLight>* greenState = stateMachine.AddState(std::make_unique<GreenState>());
+    StateMachine<MinerAttribute> stateMachine;
+    stateMachine.GetAttribute().MaxGold = 10;
+    stateMachine.GetAttribute().MaxOreNum = 5;
+    stateMachine.GetAttribute().MaxWater = 2;
 
-    stateMachine.AddTransition(std::make_unique<FromRedToYellow>(), redState, yellowState);
-    stateMachine.AddTransition(std::make_unique<FromYellowToGreen>(), yellowState, greenState);
-    stateMachine.AddTransition(std::make_unique<FromGreenToRed>(), greenState, redState);
+    const State<MinerAttribute>* mineState = stateMachine.AddState(std::make_unique<MineAndDig>());
+    const State<MinerAttribute>* thirstState = stateMachine.AddState(std::make_unique<QuenchThirst>());
+    const State<MinerAttribute>* bankState = stateMachine.AddState(std::make_unique<DepositGold>());
+    const State<MinerAttribute>* homeState = stateMachine.AddState(std::make_unique<SleepAndRest>());
 
-    stateMachine.SetEntryState(redState);
+    stateMachine.SetEntryState(mineState);
 
-    stateMachine.GetAttribute().SetTransitional(false);
+    stateMachine.AddTransition(std::make_unique<FromBankToHome>(), bankState, homeState);
+    stateMachine.AddTransition(std::make_unique<FromBankToMine>(), bankState, mineState);
+    stateMachine.AddTransition(std::make_unique<FromHomeToMine>(), homeState, mineState);
+    stateMachine.AddTransition(std::make_unique<FromMineToBank>(), mineState, bankState);
+    stateMachine.AddTransition(std::make_unique<FromMineToThirst>(), mineState, thirstState);
+    stateMachine.AddTransition(std::make_unique<FromThirstToMine>(), thirstState, mineState);
 
-    stateMachine.UpdateStateMachine();
-
-    stateMachine.GetAttribute().SetTransitional(true);
-
-    stateMachine.UpdateStateMachine();
-    stateMachine.UpdateStateMachine();
-    stateMachine.UpdateStateMachine();
-
-    stateMachine.GetAttribute().SetTransitional(false);
-
-    stateMachine.UpdateStateMachine();
-    stateMachine.UpdateStateMachine();
+    for (size_t index = 0; index < LOOP_LIMIT; ++index)
+    {
+        stateMachine.UpdateStateMachine();
+    }
 
     return 0;
 }

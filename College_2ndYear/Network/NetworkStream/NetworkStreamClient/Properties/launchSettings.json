@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NetworkStreamClient": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\NetTest\\Client\\ClientTest.txt"
+    }
+  }
+}

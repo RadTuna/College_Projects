@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="GameObject.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Ghost.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="PacMan.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="PathFinder.cpp">
+      <Filter>Nav</Filter>
+    </ClCompile>
+    <ClCompile Include="NavMap.cpp">
+      <Filter>Nav</Filter>
+    </ClCompile>
+    <ClCompile Include="Roam.cpp">
+      <Filter>FSM\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Hunted.cpp">
+      <Filter>FSM\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Chase.cpp">
+      <Filter>FSM\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Dead.cpp">
+      <Filter>FSM\State</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="GameObjects">
+      <UniqueIdentifier>{6e2290fe-03b0-43ac-a0a5-c247bd1dd469}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{4fa0e004-5073-427d-8d11-d31cfcb8b42e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{b137f726-304f-4eb3-a04f-2f8a849267fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FSM">
+      <UniqueIdentifier>{7a1dc08e-d16d-48be-9a99-0ab0a63c8486}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FSM\State">
+      <UniqueIdentifier>{ff6d93ef-aa9d-4489-9fb3-3e4409d6e58b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FSM\Transition">
+      <UniqueIdentifier>{e1163c28-362c-4d11-b957-030aee942632}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer">
+      <UniqueIdentifier>{98187bff-2d3d-49ad-a033-21e9c16a45da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nav">
+      <UniqueIdentifier>{3baf729d-2988-4c2c-82ea-d9b8f81a39e0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GameObject.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Ghost.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="PacMan.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeDefinition.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Roam.h">
+      <Filter>FSM\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Chase.h">
+      <Filter>FSM\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Hunted.h">
+      <Filter>FSM\State</Filter>
+    </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMachine.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="Transition.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="Queue.h">
+      <Filter>Nav</Filter>
+    </ClInclude>
+    <ClInclude Include="PathFinder.h">
+      <Filter>Nav</Filter>
+    </ClInclude>
+    <ClInclude Include="NavMap.h">
+      <Filter>Nav</Filter>
+    </ClInclude>
+    <ClInclude Include="Dead.h">
+      <Filter>FSM\State</Filter>
+    </ClInclude>
+    <ClInclude Include="RoamToChase.h">
+      <Filter>FSM\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="ChaseToRoam.h">
+      <Filter>FSM\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="RoamToHunted.h">
+      <Filter>FSM\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="HuntedToRoam.h">
+      <Filter>FSM\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="ChaseToHunted.h">
+      <Filter>FSM\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="HuntedToDead.h">
+      <Filter>FSM\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="DeadToRoam.h">
+      <Filter>FSM\Transition</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

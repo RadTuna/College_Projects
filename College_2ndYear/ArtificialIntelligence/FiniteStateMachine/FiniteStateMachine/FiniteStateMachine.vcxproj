@@ -143,10 +143,21 @@
     <ClCompile Include="TrafficLight.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DepositGold.h" />
+    <ClInclude Include="FromBankToHome.h" />
+    <ClInclude Include="FromBankToMine.h" />
     <ClInclude Include="FromGreenToRed.h" />
+    <ClInclude Include="FromHomeToMine.h" />
+    <ClInclude Include="FromMineToBank.h" />
+    <ClInclude Include="FromMineToThirst.h" />
+    <ClInclude Include="FromThirstToMine.h" />
     <ClInclude Include="FromYellowToGreen.h" />
     <ClInclude Include="GreenState.h" />
+    <ClInclude Include="MineAndDig.h" />
+    <ClInclude Include="MinerAttribute.h" />
+    <ClInclude Include="QuenchThirst.h" />
     <ClInclude Include="RedState.h" />
+    <ClInclude Include="SleepAndRest.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateMachine.h" />
     <ClInclude Include="FromRedToYellow.h" />

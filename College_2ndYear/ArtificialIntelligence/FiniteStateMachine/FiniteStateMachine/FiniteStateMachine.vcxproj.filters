@@ -4,14 +4,23 @@
     <Filter Include="Generic">
       <UniqueIdentifier>{e99be991-0d9d-4801-9687-844c6c70b277}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Concrete">
+    <Filter Include="TrafficLight">
       <UniqueIdentifier>{e93c61ad-fdba-4a16-bab6-2b8f4e8154c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Miner">
+      <UniqueIdentifier>{ed61a369-ac80-4af1-b948-a9b2b4729324}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Miner\State">
+      <UniqueIdentifier>{7ed3aeaf-af33-44b8-9249-0b952eb649c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Miner\Transition">
+      <UniqueIdentifier>{a7df59ee-0f42-4c0a-9525-cb8a526b655a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="TrafficLight.cpp">
-      <Filter>Concrete</Filter>
+      <Filter>TrafficLight</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -25,25 +34,58 @@
       <Filter>Generic</Filter>
     </ClInclude>
     <ClInclude Include="TrafficLight.h">
-      <Filter>Concrete</Filter>
+      <Filter>TrafficLight</Filter>
     </ClInclude>
     <ClInclude Include="FromRedToYellow.h">
-      <Filter>Concrete</Filter>
+      <Filter>TrafficLight</Filter>
     </ClInclude>
     <ClInclude Include="FromYellowToGreen.h">
-      <Filter>Concrete</Filter>
+      <Filter>TrafficLight</Filter>
     </ClInclude>
     <ClInclude Include="FromGreenToRed.h">
-      <Filter>Concrete</Filter>
+      <Filter>TrafficLight</Filter>
     </ClInclude>
     <ClInclude Include="RedState.h">
-      <Filter>Concrete</Filter>
+      <Filter>TrafficLight</Filter>
     </ClInclude>
     <ClInclude Include="GreenState.h">
-      <Filter>Concrete</Filter>
+      <Filter>TrafficLight</Filter>
     </ClInclude>
     <ClInclude Include="YellowState.h">
-      <Filter>Concrete</Filter>
+      <Filter>TrafficLight</Filter>
+    </ClInclude>
+    <ClInclude Include="DepositGold.h">
+      <Filter>Miner\State</Filter>
+    </ClInclude>
+    <ClInclude Include="MineAndDig.h">
+      <Filter>Miner\State</Filter>
+    </ClInclude>
+    <ClInclude Include="QuenchThirst.h">
+      <Filter>Miner\State</Filter>
+    </ClInclude>
+    <ClInclude Include="SleepAndRest.h">
+      <Filter>Miner\State</Filter>
+    </ClInclude>
+    <ClInclude Include="FromMineToThirst.h">
+      <Filter>Miner\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="MinerAttribute.h">
+      <Filter>Miner</Filter>
+    </ClInclude>
+    <ClInclude Include="FromThirstToMine.h">
+      <Filter>Miner\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="FromMineToBank.h">
+      <Filter>Miner\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="FromBankToMine.h">
+      <Filter>Miner\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="FromBankToHome.h">
+      <Filter>Miner\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="FromHomeToMine.h">
+      <Filter>Miner\Transition</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
