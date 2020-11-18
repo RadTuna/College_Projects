@@ -58,9 +58,6 @@
     <Filter Include="FSM\Transition">
       <UniqueIdentifier>{e1163c28-362c-4d11-b957-030aee942632}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Timer">
-      <UniqueIdentifier>{98187bff-2d3d-49ad-a033-21e9c16a45da}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Nav">
       <UniqueIdentifier>{3baf729d-2988-4c2c-82ea-d9b8f81a39e0}</UniqueIdentifier>
     </Filter>
@@ -104,9 +101,6 @@
     </ClInclude>
     <ClInclude Include="Transition.h">
       <Filter>FSM</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Timer</Filter>
     </ClInclude>
     <ClInclude Include="Queue.h">
       <Filter>Nav</Filter>

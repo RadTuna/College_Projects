@@ -188,7 +188,6 @@
     <ClInclude Include="RoamToHunted.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateMachine.h" />
-    <ClInclude Include="Timer.h" />
     <ClInclude Include="Transition.h" />
     <ClInclude Include="TypeDefinition.h" />
     <ClInclude Include="World.h" />
