@@ -141,10 +141,12 @@
   <ItemGroup>
     <ClInclude Include="Chromosome.h" />
     <ClInclude Include="Genetic.h" />
+    <ClInclude Include="Node.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chromosome.cpp" />
-    <ClCompile Include="Genetic.cpp" />
+    <ClCompile Include="Node.cpp" />
+    <ClInclude Include="Chromosome.hpp" />
+    <ClInclude Include="Genetic.hpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

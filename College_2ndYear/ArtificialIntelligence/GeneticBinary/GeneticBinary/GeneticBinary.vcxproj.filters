@@ -3,10 +3,21 @@
   <ItemGroup>
     <ClInclude Include="Chromosome.h" />
     <ClInclude Include="Genetic.h" />
+    <ClInclude Include="Chromosome.hpp" />
+    <ClInclude Include="Genetic.hpp" />
+    <ClInclude Include="Node.h">
+      <Filter>City</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chromosome.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Genetic.cpp" />
+    <ClCompile Include="Node.cpp">
+      <Filter>City</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="City">
+      <UniqueIdentifier>{d5906e7a-f1be-4ceb-8e51-2ba407946540}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
